@@ -232,7 +232,7 @@
                     <table><thead><tr><th>GM</th><th>Produk</th><th>HPP</th><th>Aksi</th></tr></thead><tbody id="table-gm-proposals"></tbody></table>
                     <h4 style="margin-top: 20px;">Kelola Karyawan</h4>
                     <h5>Pelamar Masuk:</h5><table><thead><tr><th>Nama</th><th>Role</th><th>Aksi</th></tr></thead><tbody id="table-applicants"></tbody></table>
-                    <h5 style="margin-top: 15px;">Karyawan Aktif:</h5><table><thead><tr><th>Nama</th><th>Role</th><th>Gaji</th><th>Aksi</th></tr></thead><tbody id="table-staff"></tbody></table>
+                    <h5 style="margin-top: 15px;">Karyawan Aktif:</h5><table><thead><tr><th>Nama</th><th>Role</th><th>Aksi</th></tr></thead><tbody id="table-staff"></tbody></table>
                 </div>
             </div>
 
@@ -340,8 +340,8 @@
 </div>
 
 <script>
-    // Link npoint.io Anda yang aktif
-    const API_URL = "https://api.npoint.io/30d92d57d5ecf30ddffd";
+    // Link API Endpoint JSONBlob yang sudah diperbarui dan dikoreksi
+    const API_URL = "https://jsonblob.com/api/jsonBlob/01a07683-99b3-766f-b6e6-9a330fc2583c";
 
     let db = {
         users: {},       
@@ -367,7 +367,9 @@
     async function loadGame() {
         updateCloudStatus("Menyelaraskan cloud...");
         try {
-            let response = await fetch(API_URL);
+            let response = await fetch(API_URL, {
+                headers: { 'Accept': 'application/json' }
+            });
             if (response.ok) {
                 let parsed = await response.json();
                 if (parsed && parsed.users) {
@@ -406,7 +408,10 @@
             };
             let res = await fetch(API_URL, {
                 method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
                 body: JSON.stringify(saveData)
             });
             if (!res.ok) throw new Error("Gagal menyimpan server");
@@ -419,7 +424,9 @@
 
     async function backgroundSync() {
         try {
-            let response = await fetch(API_URL);
+            let response = await fetch(API_URL, {
+                headers: { 'Accept': 'application/json' }
+            });
             if (response.ok) {
                 let parsed = await response.json();
                 if (parsed && parsed.users) {
