@@ -1,0 +1,1160 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Corporate Roleplay Simulator - Full Online Realtime</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --secondary: #475569;
+            --success: #16a34a;
+            --danger: #dc2626;
+            --warning: #d97706;
+            --background: #f8fafc;
+            --card: #ffffff;
+            --text: #0f172a;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; }
+        body { background-color: var(--background); color: var(--text); padding: 20px; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .card { background: var(--card); border-radius: 12px; padding: 24px; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); margin-bottom: 20px; }
+        h1, h2, h3, h4 { margin-bottom: 16px; color: var(--text); }
+        
+        .header-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 16px; border-bottom: 2px solid #e2e8f0; flex-wrap: wrap; gap: 10px; }
+        .nav-tabs { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+        .nav-tab { padding: 8px 16px; background: #e2e8f0; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; color: var(--secondary); }
+        .nav-tab.active { background: var(--primary); color: white; }
+
+        .btn { padding: 8px 14px; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; transition: opacity 0.2s; color: white; font-size: 0.9rem; }
+        .btn:hover { opacity: 0.9; }
+        .btn-primary { background: var(--primary); }
+        .btn-success { background: var(--success); }
+        .btn-danger { background: var(--danger); }
+        .btn-warning { background: var(--warning); color: #fff; }
+        .btn-secondary { background: var(--secondary); }
+
+        input, select, textarea { width: 100%; padding: 10px; margin-bottom: 12px; border: 1px solid #cbd5e1; border-radius: 6px; }
+        .role-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-bottom: 20px; }
+        .role-card { border: 2px solid #cbd5e1; border-radius: 8px; padding: 14px; text-align: center; cursor: pointer; }
+        .role-card.selected { border-color: var(--primary); background: #eff6ff; }
+
+        table { width: 100%; border-collapse: collapse; margin-top: 12px; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #e2e8f0; font-size: 0.95rem; }
+        .hidden { display: none !important; }
+        .badge { padding: 4px 8px; border-radius: 99px; font-size: 0.8rem; font-weight: bold; background: #e2e8f0; }
+        
+        .company-box, .market-item { border: 1px solid #cbd5e1; padding: 15px; border-radius: 8px; margin-bottom: 15px; background: #fff; }
+        .market-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 15px; }
+        
+        /* Indikator Status Cloud */
+        .cloud-status {
+            position: fixed; bottom: 20px; right: 20px; background: #1e293b; color: #fff;
+            padding: 10px 16px; border-radius: 8px; font-size: 0.85rem; box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+            z-index: 1000; display: flex; align-items: center; gap: 8px;
+        }
+        .dot { height: 10px; width: 10px; background-color: #22c55e; border-radius: 50%; display: inline-block; }
+        .dot.error { background-color: #ef4444; }
+    </style>
+</head>
+<body>
+
+<div id="cloud-toast" class="cloud-status">
+    <span id="cloud-dot" class="dot"></span>
+    <span id="cloud-text">Menghubungkan ke Cloud...</span>
+</div>
+
+<div class="container">
+    <!-- AUTH SCREEN -->
+    <div id="screen-auth" class="card">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 10px;">
+            <h1>Simulasi Korporat - Online Realtime</h1>
+            <button class="btn btn-primary" onclick="manualCloudSync()" style="font-size:0.8rem;">🔄 Segarkan Data Cloud</button>
+        </div>
+        <p style="margin-bottom: 16px; color: var(--secondary);">Semua akun dan data terhubung secara online lintas perangkat secara real-time.</p>
+        
+        <div style="display: flex; gap: 10px; margin-bottom: 12px;">
+            <button class="btn btn-primary" id="auth-mode-reg" onclick="switchAuthMode('reg')">Daftar Akun Baru</button>
+            <button class="btn btn-secondary" id="auth-mode-login" onclick="switchAuthMode('login')">Login Akun</button>
+        </div>
+
+        <input type="text" id="input-name" placeholder="Nama Lengkap / Username" />
+        <input type="password" id="input-password" placeholder="Password Akun" />
+        
+        <div id="auth-role-section">
+            <h3 style="margin-top: 16px;">Pilih Role:</h3>
+            <div class="role-grid" id="role-selection">
+                <div class="role-card" data-role="CEO" onclick="selectRole('CEO')"><strong>CEO</strong><br><small>Gudang & IPO</small></div>
+                <div class="role-card" data-role="General Manager" onclick="selectRole('General Manager')"><strong>General Manager</strong><br><small>Usul Produk</small></div>
+                <div class="role-card" data-role="Direktur Keuangan" onclick="selectRole('Direktur Keuangan')"><strong>Dir. Keuangan</strong><br><small>Harga Jual</small></div>
+                <div class="role-card" data-role="Staff Marketing" onclick="selectRole('Staff Marketing')"><strong>Marketing & Sales</strong><br><small>Jual Produk</small></div>
+                <div class="role-card" data-role="Staff Produksi" onclick="selectRole('Staff Produksi')"><strong>Produksi</strong><br><small>Stok Inventaris</small></div>
+                <div class="role-card" data-role="Admin" onclick="selectRole('Admin')" style="border-color: var(--warning); background: #fffbeb;"><strong>👑 Admin</strong><br><small>Kontrol Penuh</small></div>
+            </div>
+        </div>
+        
+        <button class="btn btn-primary" id="auth-btn-action" style="width: 100%; margin-top: 10px;" onclick="handleAuthSubmit()">Daftar & Masuk (Modal Rp 1.000.000)</button>
+        
+        <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #ccc; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+            <div>
+                <p style="font-size: 0.9rem; color: var(--secondary);">*Akun Terdaftar di Cloud:</p>
+                <div id="existing-users" style="margin-top: 10px; display: flex; gap: 10px; flex-wrap: wrap;"></div>
+            </div>
+            <button class="btn btn-danger" style="font-size: 0.75rem;" onclick="resetAllData()">Reset Database Cloud</button>
+        </div>
+    </div>
+
+    <!-- DASHBOARD SCREEN -->
+    <div id="screen-dashboard" class="hidden">
+        <div class="header-bar">
+            <div>
+                <h2 id="ui-user-name">Nama</h2>
+                <span class="badge" id="ui-user-role">Role</span>
+            </div>
+            <div>
+                <span id="ui-day-badge" class="badge" style="background:#dbeafe; color:#1e40af; margin-right: 8px;">Hari ke-1</span>
+                <span id="ui-wallet-badge" class="badge" style="background:#dcfce7; color:#166534; margin-right: 8px;">Saldo: Rp 0</span>
+                <button class="btn btn-secondary" onclick="logout()">Logout</button>
+            </div>
+        </div>
+
+        <!-- NAVIGATION TABS -->
+        <div class="nav-tabs" id="nav-tabs-container">
+            <button class="nav-tab active" onclick="switchTab('workspace')">🏢 Ruang Kerja / Perusahaan</button>
+            <button class="nav-tab" onclick="switchTab('marketplace')">🛍️ Marketplace Produk</button>
+            <button class="nav-tab" onclick="switchTab('stockexchange')">📈 Bursa Saham & Dividen</button>
+            <button class="nav-tab" onclick="switchTab('bank')">🏦 Bank & Pinjaman</button>
+            <button class="nav-tab" onclick="switchTab('profile')">🔐 Profil & Password</button>
+            <button class="nav-tab hidden" id="tab-btn-admin" onclick="switchTab('admin')">👑 Panel Admin</button>
+            <button class="nav-tab" onclick="switchTab('transfer')">💸 Transfer P2P</button>
+        </div>
+
+        <!-- TAB 1: WORKSPACE -->
+        <div id="tab-workspace" class="tab-content">
+            <!-- ADMIN VIEW -->
+            <div id="view-admin" class="hidden">
+                <div class="card" style="border: 2px solid var(--warning);">
+                    <h3 style="color: var(--warning);">👑 Panel Kontrol Super Admin</h3>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 25px;">
+                        <div style="background:#f8fafc; padding:15px; border-radius:8px; border:1px solid #cbd5e1;">
+                            <h4 style="color:var(--primary);">🔐 Ubah Password User</h4>
+                            <label>Pilih User:</label>
+                            <select id="admin-target-user-pwd"><option value="">-- Pilih User --</option></select>
+                            <label>Password Baru:</label>
+                            <input type="text" id="admin-new-user-pwd" placeholder="Password baru..." />
+                            <button class="btn btn-primary" onclick="adminChangeUserPassword()">Ubah Password</button>
+                        </div>
+                        <div style="background:#f8fafc; padding:15px; border-radius:8px; border:1px solid #cbd5e1;">
+                            <h4 style="color:var(--success);">💰 Tambah Saldo (Top-up)</h4>
+                            <label>Target Jenis:</label>
+                            <select id="admin-topup-type" onchange="toggleAdminTopupTarget()">
+                                <option value="User">Personal (Wallet User)</option>
+                                <option value="Company">Perusahaan (Kas PT)</option>
+                            </select>
+                            <label>Pilih Target:</label>
+                            <select id="admin-topup-target"><option value="">-- Pilih Target --</option></select>
+                            <label>Nominal (Rp):</label>
+                            <input type="number" id="admin-topup-amount" placeholder="Nominal Top-up" />
+                            <button class="btn btn-success" onclick="adminAddBalance()">Tambah Saldo</button>
+                        </div>
+                    </div>
+                    <h4>1. Persetujuan Pinjaman Bank</h4>
+                    <table><thead><tr><th>Peminjam</th><th>Jenis</th><th>Nominal</th><th>Alasan</th><th>Aksi</th></tr></thead><tbody id="admin-table-loans"></tbody></table>
+                    <h4 style="margin-top: 30px;">2. Daftar User</h4>
+                    <table><thead><tr><th>Nama</th><th>Role</th><th>Password</th><th>PT</th><th>Saldo</th></tr></thead><tbody id="admin-table-users"></tbody></table>
+                    <h4 style="margin-top: 30px;">3. Daftar Perusahaan</h4>
+                    <table><thead><tr><th>Nama PT</th><th>CEO</th><th>Valuasi</th><th>Status</th><th>Kas PT</th></tr></thead><tbody id="admin-table-companies"></tbody></table>
+                </div>
+            </div>
+
+            <!-- CEO VIEW -->
+            <div id="view-ceo" class="hidden">
+                <div class="card" id="ceo-setup-company">
+                    <h3>Pendirian Perusahaan Baru</h3>
+                    <input type="text" id="input-company-name" placeholder="Nama Perusahaan (PT...)" />
+                    <div style="margin-bottom: 16px;">
+                        <label><input type="checkbox" id="doc-akta"> Akta Pendirian & SK Kemenkumham</label><br>
+                        <label><input type="checkbox" id="doc-npwp"> NPWP Perusahaan</label><br>
+                        <label><input type="checkbox" id="doc-nib"> Nomor Induk Berusaha (NIB)</label><br>
+                        <label><input type="checkbox" id="doc-izin"> Izin Usaha / Izin Operasional</label>
+                    </div>
+                    <button class="btn btn-primary" onclick="createCompany()">Dirikan Perusahaan</button>
+                </div>
+
+                <div class="card hidden" id="ceo-manage-company">
+                    <h3 id="ui-company-name">Nama PT</h3>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px;">
+                        <div style="background: #f8fafc; border: 1px solid #cbd5e1; padding: 15px; border-radius: 8px;">
+                            <h4 style="color: var(--primary);">📦 Gudang Inventaris</h4>
+                            <div id="ceo-warehouse-list" style="max-height: 150px; overflow-y: auto;"></div>
+                        </div>
+                        <div style="background: #eff6ff; border: 2px solid var(--primary); padding: 15px; border-radius: 8px;">
+                            <h4 style="color: var(--primary);">📈 Valuasi & IPO</h4>
+                            <p>Valuasi PT: <strong id="ui-company-valuation" style="color:var(--success);">Rp 0</strong></p>
+                            <div id="ipo-action-area" style="margin-top: 10px;"></div>
+                        </div>
+                    </div>
+                    <div style="display:flex; justify-content:space-between; align-items:center; background:#f1f5f9; padding:12px; border-radius:8px; margin-bottom:15px; flex-wrap:wrap; gap:10px;">
+                        <div>
+                            <p><strong>Hari:</strong> <span id="ui-ceo-day" style="color:var(--primary); font-weight:bold;">Hari ke-1</span></p>
+                            <p><strong>Kas PT:</strong> <span id="ui-company-treasury" style="color:var(--success); font-weight:bold;">Rp 0</span></p>
+                        </div>
+                        <button class="btn btn-warning" onclick="ceoAdvanceDay()">🌙 Majukan Hari (+1 Hari)</button>
+                    </div>
+                    <div class="company-box" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                        <div>
+                            <h4 style="font-size: 0.95rem; color: var(--success);">Tarik Keuntungan</h4>
+                            <input type="number" id="ceo-withdraw-amount" placeholder="Nominal Tarik" style="margin-bottom:8px;" />
+                            <button class="btn btn-success" style="width:100%;" onclick="ceoWithdrawProfit()">Tarik ke Dompet</button>
+                        </div>
+                        <div>
+                            <h4 style="font-size: 0.95rem; color: var(--primary);">Setor Modal</h4>
+                            <input type="number" id="ceo-deposit-amount" placeholder="Nominal Setor" style="margin-bottom:8px;" />
+                            <button class="btn btn-primary" style="width:100%;" onclick="ceoDepositCapital()">Setor ke PT</button>
+                        </div>
+                    </div>
+                    <hr style="margin: 16px 0; border: 1px solid #e2e8f0;">
+                    <h4>Pengaturan Gaji Harian</h4>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; margin-bottom: 15px;">
+                        <div><label style="font-size:0.85rem;">GM</label><input type="number" id="salary-gm" /></div>
+                        <div><label style="font-size:0.85rem;">Dir. Keuangan</label><input type="number" id="salary-fin" /></div>
+                        <div><label style="font-size:0.85rem;">Marketing</label><input type="number" id="salary-mkt" /></div>
+                        <div><label style="font-size:0.85rem;">Produksi</label><input type="number" id="salary-prod" /></div>
+                    </div>
+                    <button class="btn btn-success" onclick="updateSalarySettings()">Simpan Gaji</button>
+                    <hr style="margin: 16px 0; border: 1px solid #e2e8f0;">
+                    <h4>Tambah Produk Utama</h4>
+                    <input type="text" id="input-product-name" placeholder="Nama Produk" />
+                    <input type="number" id="input-product-cost" placeholder="HPP / Biaya Dasar (Rp)" />
+                    <button class="btn btn-success" onclick="addProduct()">Tambah Produk</button>
+                    <h4 style="margin-top: 20px;">Usulan Produk dari GM</h4>
+                    <table><thead><tr><th>GM</th><th>Produk</th><th>HPP</th><th>Aksi</th></tr></thead><tbody id="table-gm-proposals"></tbody></table>
+                    <h4 style="margin-top: 20px;">Kelola Karyawan</h4>
+                    <h5>Pelamar Masuk:</h5><table><thead><tr><th>Nama</th><th>Role</th><th>Aksi</th></tr></thead><tbody id="table-applicants"></tbody></table>
+                    <h5 style="margin-top: 15px;">Karyawan Aktif:</h5><table><thead><tr><th>Nama</th><th>Role</th><th>Gaji</th><th>Aksi</th></tr></thead><tbody id="table-staff"></tbody></table>
+                </div>
+            </div>
+
+            <!-- STAFF VIEW -->
+            <div id="view-staff" class="hidden">
+                <div id="job-market"></div>
+                <div id="staff-workspace" class="hidden" style="margin-top: 20px;">
+                    <h3>Ruang Kerja <span id="ui-workspace-pt" class="badge">PT</span></h3>
+                    <p style="font-size: 0.9rem; color:var(--secondary); margin-bottom: 15px;">Gaji: <strong id="ui-staff-salary" style="color:var(--success);">Rp 0 / hari</strong></p>
+                    
+                    <div id="workspace-gm" class="hidden">
+                        <h4>Usul Produk Baru ke CEO</h4>
+                        <input type="text" id="gm-prod-name" placeholder="Nama Produk" />
+                        <input type="number" id="gm-prod-cost" placeholder="Estimasi HPP" />
+                        <button class="btn btn-warning" onclick="submitGMProposal()">Kirim Usulan</button>
+                    </div>
+                    <div id="workspace-finance" class="hidden">
+                        <h4>Direktur Keuangan: Tetapkan Harga Jual</h4>
+                        <table><thead><tr><th>Produk</th><th>HPP</th><th>Harga Jual</th><th>Margin</th><th>Aksi</th></tr></thead><tbody id="table-finance-products"></tbody></table>
+                    </div>
+                    <div id="workspace-marketing" class="hidden">
+                        <h4>Marketing: Penjualan Produk</h4>
+                        <div class="company-box" style="background:#f8fafc; border:1px solid var(--primary);">
+                            <h4>🤝 Penjualan Langsung ke User</h4>
+                            <label>Pembeli:</label><select id="direct-sale-buyer"><option value="">-- Pilih --</option></select>
+                            <label>Produk:</label><select id="direct-sale-product"><option value="">-- Pilih --</option></select>
+                            <label>Jumlah Unit:</label><input type="number" id="direct-sale-qty" value="1" />
+                            <button class="btn btn-success" onclick="executeDirectSale()">Jual Langsung</button>
+                        </div>
+                        <h4 style="margin-top:20px;">Publikasi ke Marketplace</h4>
+                        <table><thead><tr><th>Produk</th><th>Harga</th><th>Stok</th><th>Aksi</th></tr></thead><tbody id="table-marketing-products"></tbody></table>
+                    </div>
+                    <div id="workspace-production" class="hidden">
+                        <h4>Staff Produksi: Kapasitas & Stok</h4>
+                        <div style="background: #f1f5f9; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                            <p>Sertifikasi: <strong id="ui-cert-status" style="color:var(--danger)">Belum (Maks 20 Unit/Hari)</strong></p>
+                            <button id="btn-cert" class="btn btn-primary" style="margin-top: 10px;" onclick="takeCertification()">Ambil Pelatihan (Rp 50.000)</button>
+                        </div>
+                        <table><thead><tr><th>Produk</th><th>Harga</th><th>HPP</th><th>Stok PT</th><th>Sisa Kuota</th><th>Produksi</th></tr></thead><tbody id="table-production-products"></tbody></table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 2: MARKETPLACE -->
+        <div id="tab-marketplace" class="tab-content hidden">
+            <div class="card">
+                <h3>🛍️ Marketplace Produk Perusahaan</h3>
+                <div class="market-grid" id="marketplace-container"></div>
+            </div>
+        </div>
+
+        <!-- TAB 3: STOCK EXCHANGE -->
+        <div id="tab-stockexchange" class="tab-content hidden">
+            <div class="card">
+                <h3>📈 Bursa Saham & Dividen</h3>
+                <h4>Daftar Saham Tbk</h4>
+                <table><thead><tr><th>PT</th><th>Harga Saham</th><th>Total Lembar</th><th>Tersedia</th><th>Kapitalisasi</th><th>Aksi</th></tr></thead><tbody id="stock-market-table"></tbody></table>
+                <h4 style="margin-top: 30px;">Portofolio Anda</h4>
+                <table><thead><tr><th>PT</th><th>Lembar</th><th>Harga/lbr</th><th>Nilai Total</th><th>Aksi</th></tr></thead><tbody id="my-portfolio-table"></tbody></table>
+                <h4 style="margin-top: 30px;">🏛️ Proposal Dividen</h4>
+                <div id="ceo-dividend-creator" class="company-box hidden" style="background:#f8fafc; border:2px solid var(--primary); margin-bottom:20px;">
+                    <h4 style="color:var(--primary);">Buat Proposal Dividen (CEO)</h4>
+                    <label>Dividen per Lembar (Rp):</label><input type="number" id="input-dividend-per-share" placeholder="Contoh: 100" />
+                    <button class="btn btn-success" onclick="createDividendProposal()">Ajukan Proposal</button>
+                </div>
+                <table><thead><tr><th>PT</th><th>Dividen/lbr</th><th>Total Payout</th><th>Status</th><th>Aksi</th></tr></thead><tbody id="dividend-proposals-table"></tbody></table>
+            </div>
+        </div>
+
+        <!-- TAB 4: BANK -->
+        <div id="tab-bank" class="tab-content hidden">
+            <div class="card">
+                <h3>🏦 Bank Korporat (Bunga 5%)</h3>
+                <select id="loan-target-type"><option value="Personal">Pinjaman Pribadi</option><option value="Company">Pinjaman Korporat (CEO)</option></select>
+                <input type="number" id="loan-amount" placeholder="Nominal Pinjaman" />
+                <textarea id="loan-reason" rows="3" placeholder="Alasan Pinjaman..."></textarea>
+                <button class="btn btn-success" onclick="submitLoanApplication()">Ajukan Pinjaman</button>
+                <h4 style="margin-top: 30px;">Status Pinjaman</h4>
+                <table><thead><tr><th>ID</th><th>Tujuan</th><th>Pokok</th><th>Tagihan</th><th>Status</th><th>Aksi</th></tr></thead><tbody id="my-loans-table"></tbody></table>
+            </div>
+        </div>
+
+        <!-- TAB 5: PROFILE -->
+        <div id="tab-profile" class="tab-content hidden">
+            <div class="card" style="max-width: 500px;">
+                <h3>🔐 Profil & Password</h3>
+                <label>Username:</label><input type="text" id="profile-name" disabled style="background:#f1f5f9;" />
+                <label>Role:</label><input type="text" id="profile-role" disabled style="background:#f1f5f9;" />
+                <label>Password Baru:</label><input type="password" id="profile-new-password" placeholder="Password baru..." />
+                <button class="btn btn-primary" style="width:100%;" onclick="updateUserPassword()">Simpan Password</button>
+            </div>
+        </div>
+
+        <!-- TAB 6: TRANSFER P2P -->
+        <div id="tab-transfer" class="tab-content hidden">
+            <div class="card" style="max-width: 500px;">
+                <h3>💸 Transfer Dana P2P</h3>
+                <label>Penerima:</label><select id="transfer-target-user"><option value="">-- Pilih User --</option></select>
+                <label>Nominal (Rp):</label><input type="number" id="transfer-amount" placeholder="Nominal" />
+                <button class="btn btn-primary" style="width:100%;" onclick="executeTransfer()">Kirim Transfer</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Link npoint.io Anda yang aktif
+    const API_URL = "https://api.npoint.io/30d92d57d5ecf30ddffd";
+
+    let db = {
+        users: {},       
+        companies: {},   
+        marketProducts: [], 
+        loans: [],       
+        dividendProposals: [], 
+        adminCode: "Bisnis2026"
+    };
+    let currentUser = null;
+    let selectedRole = "";
+    let authMode = "reg";
+
+    function updateCloudStatus(status, isError = false) {
+        const textEl = document.getElementById('cloud-text');
+        const dotEl = document.getElementById('cloud-dot');
+        if (textEl && dotEl) {
+            textEl.innerText = status;
+            dotEl.className = isError ? "dot error" : "dot";
+        }
+    }
+
+    async function loadGame() {
+        updateCloudStatus("Menyelaraskan cloud...");
+        try {
+            let response = await fetch(API_URL);
+            if (response.ok) {
+                let parsed = await response.json();
+                if (parsed && parsed.users) {
+                    db.users = parsed.users || {};
+                    db.companies = parsed.companies || {};
+                    db.marketProducts = parsed.marketProducts || [];
+                    db.loans = parsed.loans || [];
+                    db.dividendProposals = parsed.dividendProposals || [];
+                    db.adminCode = parsed.adminCode || "Bisnis2026";
+
+                    if (currentUser && db.users[currentUser.name]) {
+                        currentUser = db.users[currentUser.name];
+                        let walletEl = document.getElementById('ui-wallet-badge');
+                        if (walletEl) walletEl.innerText = `Saldo: Rp ${currentUser.wallet.toLocaleString('id-ID')}`;
+                    }
+                }
+                updateCloudStatus("☁️ Terhubung & Sinkron");
+            }
+        } catch (e) {
+            console.error("Gagal load:", e);
+            updateCloudStatus("⚠️ Gagal Terhubung ke Cloud", true);
+        }
+        renderDebugUsers();
+    }
+
+    async function saveGame() {
+        updateCloudStatus("Menyimpan ke cloud...");
+        try {
+            const saveData = {
+                users: db.users,
+                companies: db.companies,
+                marketProducts: db.marketProducts,
+                loans: db.loans,
+                dividendProposals: db.dividendProposals,
+                adminCode: db.adminCode
+            };
+            let res = await fetch(API_URL, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(saveData)
+            });
+            if (!res.ok) throw new Error("Gagal menyimpan server");
+            updateCloudStatus("☁️ Perubahan Tersimpan Online");
+        } catch (e) {
+            console.error("Gagal save:", e);
+            updateCloudStatus("❌ Gagal Menyimpan", true);
+        }
+    }
+
+    async function backgroundSync() {
+        try {
+            let response = await fetch(API_URL);
+            if (response.ok) {
+                let parsed = await response.json();
+                if (parsed && parsed.users) {
+                    db.users = parsed.users || {};
+                    db.companies = parsed.companies || {};
+                    db.marketProducts = parsed.marketProducts || [];
+                    db.loans = parsed.loans || [];
+                    db.dividendProposals = parsed.dividendProposals || [];
+                    renderDebugUsers();
+                    if (currentUser && !document.getElementById('screen-dashboard').classList.contains('hidden')) {
+                        currentUser = db.users[currentUser.name] || currentUser;
+                        updateDayDisplay();
+                    }
+                }
+            }
+        } catch (e) {}
+    }
+
+    async function manualCloudSync() {
+        await loadGame();
+        alert("🔄 Data berhasil disegarkan dari Cloud!");
+    }
+
+    window.onload = async function() {
+        await loadGame();
+        setInterval(backgroundSync, 4000);
+    };
+
+    function switchAuthMode(mode) {
+        authMode = mode;
+        const btnReg = document.getElementById('auth-mode-reg');
+        const btnLogin = document.getElementById('auth-mode-login');
+        const roleSec = document.getElementById('auth-role-section');
+        const btnAction = document.getElementById('auth-btn-action');
+
+        if (mode === 'reg') {
+            btnReg.className = "btn btn-primary";
+            btnLogin.className = "btn btn-secondary";
+            roleSec.classList.remove('hidden');
+            btnAction.innerText = "Daftar & Masuk (Modal Rp 1.000.000)";
+        } else {
+            btnReg.className = "btn btn-secondary";
+            btnLogin.className = "btn btn-primary";
+            roleSec.classList.add('hidden');
+            btnAction.innerText = "Login ke Akun";
+        }
+    }
+
+    function renderDebugUsers() {
+        const container = document.getElementById('existing-users');
+        if (!container) return;
+        container.innerHTML = "";
+        let count = 0;
+        for (let name in db.users) {
+            count++;
+            let u = db.users[name];
+            let btn = document.createElement('button');
+            btn.className = "btn btn-secondary";
+            btn.style.fontSize = "0.8rem";
+            btn.innerText = `${u.name} (${u.role})`;
+            btn.onclick = () => quickLogin(name);
+            container.appendChild(btn);
+        }
+        if (count === 0) container.innerHTML = `<span style="font-size:0.85rem; color:var(--secondary)">Belum ada akun di cloud.</span>`;
+    }
+
+    function updateTransferDropdown() {
+        const select = document.getElementById('transfer-target-user');
+        if(!select) return;
+        select.innerHTML = '<option value="">-- Pilih Tujuan --</option>';
+        for (let name in db.users) {
+            if (currentUser && name !== currentUser.name) {
+                select.innerHTML += `<option value="${name}">${name} (${db.users[name].role})</option>`;
+            }
+        }
+    }
+
+    function selectRole(role) {
+        if (role === 'Admin') {
+            let code = prompt("Masukkan Kode Akses Admin:");
+            if (code !== db.adminCode) return alert("Kode akses Admin salah!");
+        }
+        selectedRole = role;
+        document.querySelectorAll('.role-card').forEach(c => c.classList.remove('selected'));
+        let target = document.querySelector(`.role-card[data-role="${role}"]`);
+        if (target) target.classList.add('selected');
+    }
+
+    async function handleAuthSubmit() {
+        const name = document.getElementById('input-name').value.trim();
+        const password = document.getElementById('input-password').value.trim();
+        if (!name || !password) return alert("Isi nama dan password!");
+        await loadGame();
+
+        if (authMode === 'reg') {
+            if (!selectedRole) return alert("Pilih role!");
+            if (db.users[name]) return alert("Nama akun sudah terdaftar di cloud!");
+            
+            db.users[name] = { 
+                name: name, password: password, role: selectedRole, 
+                companyId: null, certified: false, wallet: 1000000, 
+                producedToday: 0, lastDayProcessed: 1, portfolio: {}
+            };
+            currentUser = db.users[name];
+            await saveGame();
+            openDashboard();
+        } else {
+            let u = db.users[name];
+            if (!u) return alert("Akun tidak ditemukan di Cloud!");
+            if (u.password !== password) return alert("Password salah!");
+            if (u.role === 'Admin') {
+                let code = prompt("Kode Akses Admin:");
+                if (code !== db.adminCode) return alert("Kode admin salah!");
+            }
+            currentUser = u;
+            await saveGame();
+            openDashboard();
+        }
+    }
+
+    async function quickLogin(name) {
+        await loadGame();
+        let u = db.users[name];
+        if (!u) return alert("Akun tidak ditemukan.");
+        let pwd = prompt(`Password untuk ${name}:`);
+        if (pwd !== u.password) return alert("Password salah!");
+        if (u.role === 'Admin') {
+            let code = prompt("Kode Akses Admin:");
+            if (code !== db.adminCode) return alert("Kode admin salah!");
+        }
+        currentUser = u;
+        await saveGame();
+        openDashboard();
+    }
+
+    async function logout() {
+        currentUser = null;
+        await saveGame();
+        document.getElementById('screen-dashboard').classList.add('hidden');
+        document.getElementById('screen-auth').classList.remove('hidden');
+        document.getElementById('input-name').value = "";
+        document.getElementById('input-password').value = "";
+        selectedRole = "";
+        renderDebugUsers();
+    }
+
+    function switchTab(tabName) {
+        document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+        document.querySelectorAll('.nav-tab').forEach(el => el.classList.remove('active'));
+        let targetTab = document.getElementById(`tab-${tabName}`);
+        if (targetTab) targetTab.classList.remove('hidden');
+        if (event && event.currentTarget) event.currentTarget.classList.add('active');
+
+        if (tabName === 'marketplace') renderMarketplace();
+        if (tabName === 'stockexchange') renderStockExchange();
+        if (tabName === 'bank') renderMyLoans();
+        if (tabName === 'profile') loadProfileData();
+        if (tabName === 'admin') renderAdmin();
+    }
+
+    function openDashboard() {
+        document.getElementById('screen-auth').classList.add('hidden');
+        document.getElementById('screen-dashboard').classList.remove('hidden');
+        document.getElementById('ui-user-name').innerText = currentUser.name;
+        document.getElementById('ui-user-role').innerText = currentUser.role;
+        document.getElementById('ui-wallet-badge').innerText = `Saldo: Rp ${currentUser.wallet.toLocaleString('id-ID')}`;
+
+        updateTransferDropdown();
+        updateDayDisplay();
+
+        if (currentUser.role === 'Admin') {
+            document.getElementById('tab-btn-admin').classList.remove('hidden');
+        } else {
+            document.getElementById('tab-btn-admin').classList.add('hidden');
+        }
+        switchTab('workspace');
+        renderWorkspace();
+    }
+
+    function updateDayDisplay() {
+        let currentDay = 1;
+        if (currentUser && currentUser.companyId && db.companies[currentUser.companyId]) {
+            currentDay = db.companies[currentUser.companyId].day;
+        } else {
+            for (let id in db.companies) {
+                let comp = db.companies[id];
+                if (comp.staff.some(s => s.name === currentUser.name)) {
+                    currentDay = comp.day;
+                    break;
+                }
+            }
+        }
+        let dayEl = document.getElementById('ui-day-badge');
+        if (dayEl) dayEl.innerText = `Hari ke-${currentDay}`;
+    }
+
+    function renderWorkspace() {
+        updateDayDisplay();
+        document.getElementById('view-admin').classList.add('hidden');
+        document.getElementById('view-ceo').classList.add('hidden');
+        document.getElementById('view-staff').classList.add('hidden');
+
+        if (currentUser.role === 'Admin') {
+            document.getElementById('view-admin').classList.remove('hidden');
+            renderAdmin();
+        } else if (currentUser.role === 'CEO') {
+            document.getElementById('view-ceo').classList.remove('hidden');
+            renderCEO();
+        } else {
+            document.getElementById('view-staff').classList.remove('hidden');
+            renderStaff();
+        }
+    }
+
+    // --- ADMIN FUNCTIONS ---
+    function renderAdmin() {
+        const selUserPwd = document.getElementById('admin-target-user-pwd');
+        if (!selUserPwd) return;
+        selUserPwd.innerHTML = '<option value="">-- Pilih User --</option>';
+        for (let name in db.users) selUserPwd.innerHTML += `<option value="${name}">${name} (${db.users[name].role})</option>`;
+        toggleAdminTopupTarget();
+
+        const tbodyLoans = document.getElementById('admin-table-loans');
+        tbodyLoans.innerHTML = "";
+        db.loans.forEach((l, idx) => {
+            let act = l.status === 'Pending' ? `<button class="btn btn-success" style="padding:4px;" onclick="processLoan(${idx}, 'Approved')">Setujui</button> <button class="btn btn-danger" style="padding:4px;" onclick="processLoan(${idx}, 'Rejected')">Tolak</button>` : `<span class="badge">${l.status}</span>`;
+            tbodyLoans.innerHTML += `<tr><td>${l.applicantName}</td><td>${l.targetType}</td><td>Rp ${l.amount.toLocaleString('id-ID')}</td><td>${l.reason}</td><td>${act}</td></tr>`;
+        });
+        if (db.loans.length === 0) tbodyLoans.innerHTML = `<tr><td colspan="5" style="color:var(--secondary)">Tidak ada pinjaman.</td></tr>`;
+
+        const tbodyUsers = document.getElementById('admin-table-users');
+        tbodyUsers.innerHTML = "";
+        for (let name in db.users) {
+            let u = db.users[name];
+            let compName = u.companyId && db.companies[u.companyId] ? db.companies[u.companyId].name : "-";
+            tbodyUsers.innerHTML += `<tr><td><strong>${u.name}</strong></td><td><span class="badge">${u.role}</span></td><td><code>${u.password}</code></td><td>${compName}</td><td style="color:var(--success);">Rp ${u.wallet.toLocaleString('id-ID')}</td></tr>`;
+        }
+
+        const tbodyComps = document.getElementById('admin-table-companies');
+        tbodyComps.innerHTML = "";
+        for (let id in db.companies) {
+            let c = db.companies[id];
+            let val = getCompanyValuation(c);
+            let ipoBadge = c.isPublic ? `<span class="badge" style="background:#dcfce7; color:#166534;">Tbk</span>` : `<span class="badge">Private</span>`;
+            tbodyComps.innerHTML += `<tr><td><strong>${c.name}</strong></td><td>${c.ceoName}</td><td>Rp ${val.toLocaleString('id-ID')}</td><td>${ipoBadge}</td><td style="color:var(--success);">Rp ${c.treasury.toLocaleString('id-ID')}</td></tr>`;
+        }
+        if (Object.keys(db.companies).length === 0) tbodyComps.innerHTML = `<tr><td colspan="5" style="color:var(--secondary)">Belum ada PT.</td></tr>`;
+    }
+
+    function toggleAdminTopupTarget() {
+        let type = document.getElementById('admin-topup-type').value;
+        let targetSel = document.getElementById('admin-topup-target');
+        if (!targetSel) return;
+        targetSel.innerHTML = "";
+        if (type === 'User') {
+            for (let name in db.users) targetSel.innerHTML += `<option value="${name}">${name}</option>`;
+        } else {
+            for (let id in db.companies) targetSel.innerHTML += `<option value="${id}">${db.companies[id].name}</option>`;
+        }
+    }
+
+    async function adminChangeUserPassword() {
+        let name = document.getElementById('admin-target-user-pwd').value;
+        let pwd = document.getElementById('admin-new-user-pwd').value.trim();
+        if (!name || !pwd) return alert("Lengkapi data!");
+        db.users[name].password = pwd;
+        await saveGame();
+        alert("Password diubah.");
+        renderAdmin();
+    }
+
+    async function adminAddBalance() {
+        let type = document.getElementById('admin-topup-type').value;
+        let target = document.getElementById('admin-topup-target').value;
+        let amt = parseFloat(document.getElementById('admin-topup-amount').value);
+        if (!target || isNaN(amt) || amt <= 0) return alert("Data tidak valid!");
+        if (type === 'User') db.users[target].wallet += amt;
+        else db.companies[target].treasury += amt;
+        await saveGame();
+        alert("Saldo ditambahkan.");
+        renderAdmin();
+    }
+
+    async function processLoan(idx, status) {
+        let l = db.loans[idx];
+        l.status = status;
+        if (status === 'Approved') {
+            l.totalDue = l.amount;
+            if (l.targetType === 'Personal') db.users[l.applicantName].wallet += l.amount;
+            else if (db.companies[l.companyId]) db.companies[l.companyId].treasury += l.amount;
+        }
+        await saveGame();
+        renderAdmin();
+    }
+
+    // --- CEO FUNCTIONS ---
+    function getMyCompany() {
+        for (let id in db.companies) if (db.companies[id].ceoName === currentUser.name) return db.companies[id];
+        return null;
+    }
+
+    function getCompanyValuation(comp) {
+        let val = comp.treasury;
+        comp.products.forEach(p => val += (p.stock || 0) * (p.price || p.cost || 0));
+        return val;
+    }
+
+    function renderCEO() {
+        let myComp = getMyCompany();
+        if (!myComp) {
+            document.getElementById('ceo-setup-company').classList.remove('hidden');
+            document.getElementById('ceo-manage-company').classList.add('hidden');
+        } else {
+            document.getElementById('ceo-setup-company').classList.add('hidden');
+            document.getElementById('ceo-manage-company').classList.remove('hidden');
+            document.getElementById('ui-company-name').innerText = myComp.name;
+            document.getElementById('ui-ceo-day').innerText = `Hari ke-${myComp.day}`;
+            document.getElementById('ui-company-treasury').innerText = `Rp ${myComp.treasury.toLocaleString('id-ID')}`;
+
+            const wh = document.getElementById('ceo-warehouse-list');
+            wh.innerHTML = "";
+            myComp.products.forEach(p => wh.innerHTML += `<p>📦 <strong>${p.name}</strong>: ${p.stock || 0} Unit</p>`);
+            if (myComp.products.length === 0) wh.innerHTML = `<p style="color:var(--secondary)">Gudang kosong.</p>`;
+
+            let val = getCompanyValuation(myComp);
+            document.getElementById('ui-company-valuation').innerText = `Rp ${val.toLocaleString('id-ID')}`;
+            
+            const ipo = document.getElementById('ipo-action-area');
+            if (myComp.isPublic) ipo.innerHTML = `<span class="badge" style="background:#dcfce7; color:#166534;">Tbk (Rp ${myComp.stockPrice}/lbr)</span>`;
+            else ipo.innerHTML = val >= 100000000 ? `<button class="btn btn-success" onclick="executeIPO('${myComp.id}')">🚀 IPO Sekarang</button>` : `<button class="btn btn-secondary" disabled>IPO (Min 100 Juta)</button>`;
+
+            document.getElementById('salary-gm').value = myComp.salaries['General Manager'];
+            document.getElementById('salary-fin').value = myComp.salaries['Direktur Keuangan'];
+            document.getElementById('salary-mkt').value = myComp.salaries['Staff Marketing'];
+            document.getElementById('salary-prod').value = myComp.salaries['Staff Produksi'];
+
+            const tbodyProp = document.getElementById('table-gm-proposals');
+            tbodyProp.innerHTML = "";
+            myComp.gmProposals.forEach((prop, idx) => {
+                tbodyProp.innerHTML += `<tr><td>${prop.gmName}</td><td>${prop.name}</td><td>Rp ${prop.cost.toLocaleString('id-ID')}</td><td><button class="btn btn-success" onclick="approveGMProposal(${idx})">Setujui</button></td></tr>`;
+            });
+            if (myComp.gmProposals.length === 0) tbodyProp.innerHTML = `<tr><td colspan="4" style="color:var(--secondary)">Tidak ada usulan.</td></tr>`;
+
+            const tbodyApp = document.getElementById('table-applicants');
+            tbodyApp.innerHTML = "";
+            myComp.applicants.forEach(app => {
+                tbodyApp.innerHTML += `<tr><td>${app.name}</td><td><span class="badge">${app.role}</span></td><td><button class="btn btn-success" onclick="hireUser('${myComp.id}', '${app.name}')">Terima</button></td></tr>`;
+            });
+            if (myComp.applicants.length === 0) tbodyApp.innerHTML = `<tr><td colspan="3" style="color:var(--secondary)">Tidak ada pelamar.</td></tr>`;
+
+            const tbodyStaff = document.getElementById('table-staff');
+            tbodyStaff.innerHTML = "";
+            myComp.staff.forEach(st => {
+                let sal = myComp.salaries[st.role] || 0;
+                tbodyStaff.innerHTML += `<tr><td>${st.name}</td><td><span class="badge">${st.role}</span></td><td>Rp ${sal.toLocaleString('id-ID')}</td><td><button class="btn btn-danger" onclick="fireUser('${myComp.id}', '${st.name}')">Pecat</button></td></tr>`;
+            });
+            if (myComp.staff.length === 0) tbodyStaff.innerHTML = `<tr><td colspan="4" style="color:var(--secondary)">Tidak ada karyawan.</td></tr>`;
+        }
+    }
+
+    async function createCompany() {
+        const name = document.getElementById('input-company-name').value.trim();
+        if (!name || !document.getElementById('doc-akta').checked) return alert("Lengkapi nama dan dokumen!");
+        let compId = 'comp_' + Date.now();
+        db.companies[compId] = {
+            id: compId, name: name, ceoName: currentUser.name, day: 1, month: 1,
+            salaries: { 'General Manager': 60000, 'Direktur Keuangan': 60000, 'Staff Marketing': 40000, 'Staff Produksi': 40000 },
+            treasury: 2000000, products: [], staff: [], applicants: [], gmProposals: [], 
+            isPublic: false, stockPrice: 0, totalShares: 10000, availableShares: 5000
+        };
+        currentUser.companyId = compId;
+        db.users[currentUser.name] = currentUser;
+        await saveGame();
+        alert("PT berhasil didirikan!");
+        renderCEO();
+    }
+
+    async function executeIPO(compId) {
+        let comp = db.companies[compId];
+        let val = getCompanyValuation(comp);
+        comp.isPublic = true;
+        comp.stockPrice = Math.max(1000, Math.round(val / comp.totalShares));
+        comp.treasury += (val * 0.20);
+        await saveGame();
+        alert("IPO Sukses!");
+        renderCEO();
+    }
+
+    async function updateSalarySettings() {
+        let myComp = getMyCompany();
+        myComp.salaries['General Manager'] = parseFloat(document.getElementById('salary-gm').value) || 0;
+        myComp.salaries['Direktur Keuangan'] = parseFloat(document.getElementById('salary-fin').value) || 0;
+        myComp.salaries['Staff Marketing'] = parseFloat(document.getElementById('salary-mkt').value) || 0;
+        myComp.salaries['Staff Produksi'] = parseFloat(document.getElementById('salary-prod').value) || 0;
+        await saveGame();
+        alert("Gaji disimpan!");
+    }
+
+    async function ceoWithdrawProfit() {
+        let myComp = getMyCompany();
+        let amt = parseFloat(document.getElementById('ceo-withdraw-amount').value);
+        if (isNaN(amt) || amt <= 0 || myComp.treasury < amt) return alert("Nominal tidak valid!");
+        myComp.treasury -= amt;
+        currentUser.wallet += amt;
+        await saveGame();
+        alert("Penarikan sukses!");
+        openDashboard();
+    }
+
+    async function ceoDepositCapital() {
+        let myComp = getMyCompany();
+        let amt = parseFloat(document.getElementById('ceo-deposit-amount').value);
+        if (isNaN(amt) || amt <= 0 || currentUser.wallet < amt) return alert("Saldo kurang!");
+        currentUser.wallet -= amt;
+        myComp.treasury += amt;
+        await saveGame();
+        alert("Setor modal sukses!");
+        openDashboard();
+    }
+
+    async function ceoAdvanceDay() {
+        let myComp = getMyCompany();
+        let totalSal = 0;
+        myComp.staff.forEach(st => totalSal += (myComp.salaries[st.role] || 0));
+        if (myComp.treasury < totalSal) return alert("Kas PT tidak cukup bayar gaji!");
+        myComp.treasury -= totalSal;
+        myComp.day += 1;
+        myComp.staff.forEach(st => {
+            let u = db.users[st.name];
+            if (u) { u.wallet += (myComp.salaries[st.role] || 0); u.producedToday = 0; }
+        });
+        await saveGame();
+        alert(`Hari ke-${myComp.day}! Gaji dibayarkan.`);
+        renderCEO();
+        updateDayDisplay();
+    }
+
+    async function addProduct() {
+        let myComp = getMyCompany();
+        let name = document.getElementById('input-product-name').value.trim();
+        let cost = parseFloat(document.getElementById('input-product-cost').value);
+        if (!name || !cost) return alert("Isi nama dan HPP!");
+        myComp.products.push({ id: Date.now(), name: name, cost: cost, price: 0, stock: 0 });
+        await saveGame();
+        alert("Produk ditambah.");
+        renderCEO();
+    }
+
+    async function approveGMProposal(idx) {
+        let myComp = getMyCompany();
+        let prop = myComp.gmProposals[idx];
+        myComp.products.push({ id: Date.now(), name: prop.name, cost: prop.cost, price: 0, stock: 0 });
+        myComp.gmProposals.splice(idx, 1);
+        await saveGame();
+        renderCEO();
+    }
+
+    async function hireUser(compId, appName) {
+        let comp = db.companies[compId];
+        let app = db.users[appName];
+        comp.applicants = comp.applicants.filter(a => a.name !== appName);
+        comp.staff.push(app);
+        app.companyId = compId;
+        app.producedToday = 0;
+        await saveGame();
+        renderCEO();
+    }
+
+    async function fireUser(compId, staffName) {
+        let comp = db.companies[compId];
+        comp.staff = comp.staff.filter(s => s.name !== staffName);
+        db.users[staffName].companyId = null;
+        await saveGame();
+        renderCEO();
+    }
+
+    // --- STAFF FUNCTIONS ---
+    function renderStaff() {
+        updateDayDisplay();
+        const market = document.getElementById('job-market');
+        const workspace = document.getElementById('staff-workspace');
+        
+        if (currentUser.companyId) {
+            let activeComp = db.companies[currentUser.companyId];
+            document.getElementById('ui-staff-salary').innerText = `Rp ${(activeComp.salaries[currentUser.role] || 0).toLocaleString('id-ID')} / hari`;
+            market.innerHTML = `<div class="company-box" style="border-color:var(--success)"><h4>Bekerja di: ${activeComp.name}</h4><button class="btn btn-danger" style="margin-top:10px;" onclick="resignJob()">Resign</button></div>`;
+            workspace.classList.remove('hidden');
+            document.getElementById('ui-workspace-pt').innerText = activeComp.name;
+
+            document.getElementById('workspace-gm').classList.add('hidden');
+            document.getElementById('workspace-finance').classList.add('hidden');
+            document.getElementById('workspace-marketing').classList.add('hidden');
+            document.getElementById('workspace-production').classList.add('hidden');
+
+            if (currentUser.role === 'General Manager') document.getElementById('workspace-gm').classList.remove('hidden');
+            else if (currentUser.role === 'Direktur Keuangan') {
+                document.getElementById('workspace-finance').classList.remove('hidden');
+                renderFinanceTable(activeComp);
+            } else if (currentUser.role === 'Staff Marketing') {
+                document.getElementById('workspace-marketing').classList.remove('hidden');
+                renderMarketingWorkspace(activeComp);
+            } else if (currentUser.role === 'Staff Produksi') {
+                document.getElementById('workspace-production').classList.remove('hidden');
+                renderProductionWorkspace(activeComp);
+            }
+        } else {
+            workspace.classList.add('hidden');
+            market.innerHTML = "";
+            for (let id in db.companies) {
+                let comp = db.companies[id];
+                market.innerHTML += `<div class="company-box"><h4>${comp.name}</h4><button class="btn btn-primary" onclick="applyJob('${id}')">Lamar</button></div>`;
+            }
+        }
+    }
+
+    async function applyJob(compId) {
+        db.companies[compId].applicants.push(currentUser);
+        await saveGame();
+        renderStaff();
+    }
+
+    async function resignJob() {
+        let comp = db.companies[currentUser.companyId];
+        comp.staff = comp.staff.filter(s => s.name !== currentUser.name);
+        currentUser.companyId = null;
+        await saveGame();
+        renderStaff();
+    }
+
+    async function submitGMProposal() {
+        let name = document.getElementById('gm-prod-name').value.trim();
+        let cost = parseFloat(document.getElementById('gm-prod-cost').value);
+        if (!name || !cost) return alert("Isi data!");
+        db.companies[currentUser.companyId].gmProposals.push({ gmName: currentUser.name, name: name, cost: cost });
+        await saveGame();
+        alert("Usulan dikirim ke CEO.");
+    }
+
+    function renderFinanceTable(comp) {
+        const tbody = document.getElementById('table-finance-products');
+        tbody.innerHTML = "";
+        comp.products.forEach(p => {
+            let margin = p.price > 0 ? (((p.price - p.cost) / p.cost) * 100).toFixed(1) + "%" : "0%";
+            tbody.innerHTML += `<tr><td>${p.name}</td><td>Rp ${p.cost}</td><td><input type="number" id="price-${p.id}" value="${p.price}" style="width:100px;margin:0;" /></td><td style="color:var(--success);">${margin}</td><td><button class="btn btn-success" onclick="savePrice('${comp.id}', ${p.id})">Simpan</button></td></tr>`;
+        });
+    }
+
+    async function savePrice(compId, prodId) {
+        let comp = db.companies[compId];
+        let p = comp.products.find(x => x.id === prodId);
+        p.price = parseFloat(document.getElementById(`price-${prodId}`).value);
+        await saveGame();
+        alert("Harga disimpan.");
+        renderFinanceTable(comp);
+    }
+
+    function renderMarketingWorkspace(comp) {
+        const buyerSelect = document.getElementById('direct-sale-buyer');
+        buyerSelect.innerHTML = '<option value="">-- Pilih --</option>';
+        for (let name in db.users) if (name !== currentUser.name) buyerSelect.innerHTML += `<option value="${name}">${name}</option>`;
+
+        const prodSelect = document.getElementById('direct-sale-product');
+        prodSelect.innerHTML = '<option value="">-- Pilih --</option>';
+        comp.products.forEach(p => prodSelect.innerHTML += `<option value="${p.id}">${p.name} (Stok: ${p.stock || 0})</option>`);
+
+        const tbody = document.getElementById('table-marketing-products');
+        tbody.innerHTML = "";
+        comp.products.forEach(p => {
+            let pub = db.marketProducts.some(m => m.prodId === p.id);
+            let act = pub ? `<button class="btn btn-danger" style="padding:4px;" onclick="unpublishMarket(${p.id})">Tarik</button>` : `<button class="btn btn-primary" style="padding:4px;" onclick="publishMarket('${comp.id}', ${p.id})">Publish</button>`;
+            tbody.innerHTML += `<tr><td>${p.name}</td><td>Rp ${p.price}</td><td><strong>${p.stock || 0}</strong></td><td>${act}</td></tr>`;
+        });
+    }
+
+    async function executeDirectSale() {
+        let buyerName = document.getElementById('direct-sale-buyer').value;
+        let prodId = parseInt(document.getElementById('direct-sale-product').value);
+        let qty = parseInt(document.getElementById('direct-sale-qty').value);
+        let comp = db.companies[currentUser.companyId];
+        let p = comp.products.find(x => x.id === prodId);
+        let buyer = db.users[buyerName];
+        let total = p.price * qty;
+        if (buyer.wallet < total) return alert("Saldo pembeli kurang!");
+        buyer.wallet -= total;
+        p.stock -= qty;
+        comp.treasury += total;
+        await saveGame();
+        alert("Penjualan sukses!");
+        renderMarketingWorkspace(comp);
+    }
+
+    async function publishMarket(compId, prodId) {
+        let comp = db.companies[compId];
+        let p = comp.products.find(x => x.id === prodId);
+        db.marketProducts.push({ compId: comp.id, compName: comp.name, prodId: p.id, name: p.name, price: p.price });
+        await saveGame();
+        alert("Dipublikasikan!");
+        renderMarketingWorkspace(comp);
+    }
+
+    async function unpublishMarket(prodId) {
+        db.marketProducts = db.marketProducts.filter(m => m.prodId !== prodId);
+        await saveGame();
+        renderMarketingWorkspace(db.companies[currentUser.companyId]);
+    }
+
+    function renderProductionWorkspace(comp) {
+        const statusEl = document.getElementById('ui-cert-status');
+        if (currentUser.certified) {
+            statusEl.innerText = "Bersertifikasi (Maks 100 Unit/Hari)";
+            statusEl.style.color = "var(--success)";
+        }
+        let limit = currentUser.certified ? 100 : 20;
+        let sisa = limit - currentUser.producedToday;
+        const tbody = document.getElementById('table-production-products');
+        tbody.innerHTML = "";
+        comp.products.forEach(p => {
+            tbody.innerHTML += `<tr><td>${p.name}</td><td>Rp ${p.price || 0}</td><td>Rp ${p.cost}</td><td><strong>${p.stock || 0}</strong></td><td><strong>${sisa}</strong></td><td><button class="btn btn-primary" style="padding:4px;" onclick="produceProduct('${comp.id}', ${p.id})">Produksi 10</button></td></tr>`;
+        });
+    }
+
+    async function takeCertification() {
+        if (currentUser.wallet < 50000) return alert("Saldo kurang!");
+        currentUser.wallet -= 50000;
+        currentUser.certified = true;
+        await saveGame();
+        alert("Sertifikasi sukses!");
+        renderWorkspace();
+    }
+
+    async function produceProduct(compId, prodId) {
+        let limit = currentUser.certified ? 100 : 20;
+        if (currentUser.producedToday + 10 > limit) return alert("Batas kuota habis!");
+        let comp = db.companies[compId];
+        let p = comp.products.find(x => x.id === prodId);
+        let hpp = 10 * p.cost;
+        if (comp.treasury < hpp) return alert("Kas PT kurang!");
+        comp.treasury -= hpp;
+        currentUser.producedToday += 10;
+        p.stock = (p.stock || 0) + 10;
+        await saveGame();
+        alert("Produksi 10 unit sukses!");
+        renderProductionWorkspace(comp);
+    }
+
+    // --- MARKETPLACE & OTHER TABS ---
+    function renderMarketplace() {
+        const c = document.getElementById('marketplace-container');
+        c.innerHTML = "";
+        db.marketProducts.forEach(m => {
+            c.innerHTML += `<div class="market-item"><h4>${m.name}</h4><p>PT: ${m.compName}</p><p style="color:var(--success);font-weight:bold;">Rp ${m.price.toLocaleString('id-ID')}</p><button class="btn btn-success" style="width:100%;margin-top:8px;" onclick="buyMarketProduct('${m.compId}', ${m.prodId}, ${m.price})">Beli</button></div>`;
+        });
+        if (db.marketProducts.length === 0) c.innerHTML = `<p style="color:var(--secondary)">Marketplace kosong.</p>`;
+    }
+
+    async function buyMarketProduct(compId, prodId, price) {
+        if (currentUser.wallet < price) return alert("Saldo kurang!");
+        let comp = db.companies[compId];
+        let prod = comp.products.find(x => x.id === prodId);
+        prod.stock -= 1;
+        currentUser.wallet -= price;
+        comp.treasury += price;
+        await saveGame();
+        alert("Pembelian berhasil!");
+        renderMarketplace();
+    }
+
+    function renderStockExchange() {
+        const tm = document.getElementById('stock-market-table');
+        tm.innerHTML = "";
+        for (let id in db.companies) {
+            let c = db.companies[id];
+            if (!c.isPublic) continue;
+            tm.innerHTML += `<tr><td>${c.name}</td><td>Rp ${c.stockPrice}</td><td>${c.totalShares}</td><td>${c.availableShares}</td><td>Rp ${c.totalShares * c.stockPrice}</td><td><button class="btn btn-primary" onclick="buyShares('${c.id}')">Beli</button></td></tr>`;
+        }
+        let myComp = getMyCompany();
+        if (myComp && myComp.isPublic) document.getElementById('ceo-dividend-creator').classList.remove('hidden');
+    }
+
+    async function buyShares(compId) {
+        let comp = db.companies[compId];
+        let qty = parseInt(prompt("Lembar saham:", "100"));
+        let cost = qty * comp.stockPrice;
+        if (currentUser.wallet < cost) return alert("Saldo kurang!");
+        currentUser.wallet -= cost;
+        comp.availableShares -= qty;
+        currentUser.portfolio[compId] = (currentUser.portfolio[compId] || 0) + qty;
+        await saveGame();
+        alert("Beli saham sukses!");
+        renderStockExchange();
+    }
+
+    async function submitLoanApplication() {
+        let type = document.getElementById('loan-target-type').value;
+        let amt = parseFloat(document.getElementById('loan-amount').value);
+        let reason = document.getElementById('loan-reason').value.trim();
+        db.loans.push({ id: 'L_' + Date.now(), applicantName: currentUser.name, targetType: type, companyId: currentUser.companyId, amount: amt, totalDue: 0, reason: reason, status: 'Pending' });
+        await saveGame();
+        alert("Pinjaman diajukan!");
+        renderMyLoans();
+    }
+
+    function renderMyLoans() {
+        const tbody = document.getElementById('my-loans-table');
+        tbody.innerHTML = "";
+        db.loans.filter(l => l.applicantName === currentUser.name).forEach(l => {
+            tbody.innerHTML += `<tr><td>${l.id}</td><td>${l.targetType}</td><td>Rp ${l.amount}</td><td>Rp ${l.totalDue}</td><td><span class="badge">${l.status}</span></td><td>-</td></tr>`;
+        });
+    }
+
+    function loadProfileData() {
+        document.getElementById('profile-name').value = currentUser.name;
+        document.getElementById('profile-role').value = currentUser.role;
+    }
+
+    async function updateUserPassword() {
+        let pwd = document.getElementById('profile-new-password').value.trim();
+        if (!pwd) return alert("Isi password!");
+        currentUser.password = pwd;
+        db.users[currentUser.name].password = pwd;
+        await saveGame();
+        alert("Password diperbarui!");
+    }
+
+    async function executeTransfer() {
+        let target = document.getElementById('transfer-target-user').value;
+        let amt = parseFloat(document.getElementById('transfer-amount').value);
+        if (currentUser.wallet < amt) return alert("Saldo kurang!");
+        currentUser.wallet -= amt;
+        db.users[target].wallet += amt;
+        await saveGame();
+        alert("Transfer sukses!");
+        openDashboard();
+    }
+</script>
+
+</body>
+</html>
