@@ -3,231 +3,481 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Informatika Quest - Game Belajar Informatika</title>
-    <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #74b9ff, #a29bfe);
-            margin: 0;
-            padding: 20px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
+    <title>Cek Nilai Siswa - Batas Akses 1 Kali</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                }
+            }
         }
-        .container {
-            background: white;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
-            width: 450px;
-            text-align: center;
-        }
-        h1 {
-            color: #2d3436;
-            margin-bottom: 10px;
-        }
-        p {
-            color: #636e72;
-        }
-        button {
-            background: #0984e3;
-            color: white;
-            border: none;
-            padding: 12px 20px;
-            margin: 8px 0;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 16px;
-            width: 100%;
-            transition: background 0.3s;
-        }
-        button:hover {
-            background: #74b9ff;
-        }
-        input {
-            padding: 12px;
-            width: 90%;
-            margin: 10px 0;
-            border: 1px solid #dfe6e9;
-            border-radius: 6px;
-            font-size: 16px;
-        }
-        .hidden {
-            display: none;
-        }
-        .stats {
-            display: flex;
-            justify-content: space-between;
-            font-weight: bold;
-            margin-bottom: 20px;
-            color: #2d3436;
-            background: #dfe6e9;
-            padding: 10px;
-            border-radius: 6px;
-        }
-        .option-btn {
-            background: #00b894;
-        }
-        .option-btn:hover {
-            background: #55efc4;
-            color: #2d3436;
-        }
-        .save-btn {
-            background: #fdcb6e;
-            color: #2d3436;
-        }
-        .save-btn:hover {
-            background: #ffeaa7;
-        }
-    </style>
+    </script>
 </head>
-<body>
+<body class="bg-slate-100 font-sans text-slate-800 min-h-screen flex flex-col justify-between">
 
-    <div class="container">
-        <h1>Informatika Quest 🚀</h1>
-        
-        <div id="start-screen">
-            <p>Uji pemahaman dasar informatika Anda mulai dari biner, logika, jaringan, hingga algoritma!</p>
-            <input type="text" id="player-name" placeholder="Masukkan Nama Anda">
-            <button onclick="startGame()">Mulai Game Baru</button>
-            <button onclick="loadGame()" style="background: #6c5ce7;">Muat Game Tersimpan</button>
-        </div>
-        
-        <div id="game-screen" class="hidden">
-            <div class="stats">
-                <span id="display-level">Level: 1</span>
-                <span id="display-score">Skor: 0</span>
+    <!-- Header Navbar -->
+    <header class="bg-indigo-700 text-white shadow-lg sticky top-0 z-30">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 py-4 flex flex-wrap justify-between items-center gap-3">
+            <div class="flex items-center space-x-3">
+                <div class="p-2.5 bg-indigo-600/90 rounded-xl shadow-inner text-indigo-100">
+                    <i class="fa-solid fa-user-shield text-2xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold tracking-tight">Portal Cek Nilai Siswa</h1>
+                    <p class="text-xs text-indigo-200">Kebijakan Sistem Akses Terbatas 1x Cek</p>
+                </div>
             </div>
-            <h3 id="question-title">Pertanyaan</h3>
-            <p id="question-text">Teks pertanyaan...</p>
-            <div id="options-container"></div>
-            <button class="save-btn" onclick="saveGame()">Simpan Progress Game</button>
+
+            <!-- Dynamic Quota Badge -->
+            <div id="quotaBadge" class="flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-bold transition-all shadow-sm">
+                <!-- Javascript will populate this -->
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="max-w-4xl mx-auto px-4 sm:px-6 py-8 flex-grow w-full space-y-6">
+
+        <!-- Notice Alert Banner -->
+        <div id="statusNoticeBanner" class="bg-amber-50 border-l-4 border-amber-500 p-4 rounded-r-xl shadow-sm text-amber-900 text-sm flex items-start gap-3">
+            <i class="fa-solid fa-triangle-exclamation text-amber-500 text-xl mt-0.5 flex-shrink-0"></i>
+            <div>
+                <strong class="font-bold block text-amber-950 mb-0.5">PERATURAN PENTING: KHUSUS 1 KALI CEK</strong>
+                Setiap pengguna **HANYA MEMILIKI 1 KALI KESEMPATAN** untuk mengecek nilai siswa. Setelah tombol dicari/dikonfirmasi, form pencarian akan **langsung terkunci secara permanen** pada perangkat ini.
+            </div>
+        </div>
+
+        <!-- Search Card Box -->
+        <div class="bg-white p-6 sm:p-8 rounded-2xl shadow-sm border border-slate-200 space-y-4 relative">
+            <label for="studentSearchInput" class="block text-sm font-bold text-slate-700">
+                Pilih atau Ketik Nama Siswa
+            </label>
+
+            <div class="relative">
+                <div class="relative flex items-center">
+                    <i class="fa-solid fa-magnifying-glass absolute left-4 text-slate-400"></i>
+                    <input 
+                        type="text" 
+                        id="studentSearchInput" 
+                        autocomplete="off"
+                        placeholder="Ketik nama siswa (contoh: Adinda, Budi, Siti...)"
+                        class="w-full pl-11 pr-28 py-3.5 bg-slate-50 border border-slate-300 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all text-slate-800 font-medium text-base placeholder-slate-400 disabled:bg-slate-100 disabled:text-slate-400 disabled:cursor-not-allowed"
+                        oninput="handleInputSearch(this.value)"
+                        onkeydown="handleSearchKeyDown(event)"
+                    >
+                    <button 
+                        id="btnSubmitSearch" 
+                        onclick="triggerConfirmationModal()" 
+                        class="absolute right-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white font-semibold text-sm rounded-lg shadow-sm transition-colors disabled:bg-slate-300 disabled:cursor-not-allowed flex items-center gap-1.5"
+                    >
+                        <span>Cari Nilai</span>
+                        <i class="fa-solid fa-arrow-right text-xs"></i>
+                    </button>
+                </div>
+
+                <!-- Autocomplete Dropdown List -->
+                <div id="autocompleteDropdown" class="hidden absolute z-20 left-0 right-0 mt-2 bg-white rounded-xl shadow-xl border border-slate-200 max-h-64 overflow-y-auto divide-y divide-slate-100">
+                    <!-- Items rendered via JS -->
+                </div>
+            </div>
+
+            <!-- Hint Text -->
+            <div id="searchHint" class="flex flex-wrap items-center justify-between text-xs text-slate-500 pt-1">
+                <span><i class="fa-solid fa-circle-info mr-1"></i> Gunakan rekomendasi autocomplete untuk memastikan ejaan tepat.</span>
+                <span class="text-slate-400">Total 45 Siswa Terdaftar</span>
+            </div>
+        </div>
+
+        <!-- Locked Message / Result Display Area -->
+        <div id="resultContainer" class="hidden transition-all duration-300">
+            <!-- Populated via JS -->
+        </div>
+
+    </main>
+
+    <!-- Confirmation Modal before spending 1x check -->
+    <div id="confirmModal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 space-y-5 transform transition-all animate-in fade-in zoom-in-95">
+            <div class="flex items-center gap-3.5 text-amber-600">
+                <div class="p-3 bg-amber-100 rounded-2xl">
+                    <i class="fa-solid fa-shield-cat text-2xl"></i>
+                </div>
+                <div>
+                    <h3 class="text-lg font-bold text-slate-800">Konfirmasi 1x Kesempatan</h3>
+                    <p class="text-xs text-slate-500">Aksi ini tidak dapat dibatalkan!</p>
+                </div>
+            </div>
+
+            <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 text-xs sm:text-sm text-amber-900 leading-relaxed">
+                Anda akan melihat nilai untuk:<br>
+                <strong id="confirmStudentName" class="text-base text-indigo-900 font-bold block my-1">...</strong>
+                Inilah **SATU-SATUNYA** kesempatan Anda untuk melihat nilai. Setelah mengecek, Anda tidak bisa lagi memilih siswa lain.
+            </div>
+
+            <div class="flex items-center justify-end gap-3 pt-1">
+                <button 
+                    onclick="closeConfirmModal()" 
+                    class="px-4 py-2.5 text-xs sm:text-sm font-semibold text-slate-600 hover:bg-slate-100 rounded-xl transition-colors"
+                >
+                    Batal / Ganti Nama
+                </button>
+                <button 
+                    onclick="executeGradeCheck()" 
+                    class="px-5 py-2.5 text-xs sm:text-sm font-bold bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl shadow-md transition-all flex items-center gap-2"
+                >
+                    <i class="fa-solid fa-check"></i>
+                    <span>Ya, Lihat Nilai Sekarang</span>
+                </button>
+            </div>
         </div>
     </div>
 
+    <!-- Reset Modal for Teachers/Examiners -->
+    <div id="resetModal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 space-y-4">
+            <div class="flex items-center gap-3 text-rose-600">
+                <div class="p-3 bg-rose-100 rounded-full">
+                    <i class="fa-solid fa-rotate-left text-xl"></i>
+                </div>
+                <h3 class="text-lg font-bold text-slate-800">Reset Simulasi Demo?</h3>
+            </div>
+            <p class="text-sm text-slate-600 leading-relaxed">
+                Tindakan ini khusus untuk **Guru / Penguji** guna memulihkan sisa kesempatan dari **0/1** kembali menjadi **1/1** dan membuka kunci form pencarian.
+            </p>
+            <div class="flex justify-end gap-3 pt-2">
+                <button onclick="closeResetModal()" class="px-4 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-100 rounded-xl transition-colors">
+                    Batal
+                </button>
+                <button onclick="confirmResetDemo()" class="px-4 py-2 text-sm font-semibold bg-rose-600 hover:bg-rose-700 text-white rounded-xl shadow-sm transition-colors">
+                    Reset Kesempatan Now
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer Footer -->
+    <footer class="bg-white border-t border-slate-200 py-6 text-center text-xs text-slate-500 space-y-2 mt-auto">
+        <p>© 2026 Portal Nilai Siswa — Batas Maksimal Pengecekan Terkunci</p>
+        <div>
+            <button 
+                onclick="openResetModal()" 
+                class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-slate-500 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-all border border-slate-200"
+            >
+                <i class="fa-solid fa-lock-open text-xs"></i>
+                <span>Reset Simulasi/Demo (Khusus Guru/Penguji)</span>
+            </button>
+        </div>
+    </footer>
+
     <script>
-        // Data Pertanyaan Informatika Dasar
-        const levels = [
-            {
-                title: "Level 1: Sistem Biner",
-                question: "Berapa nilai desimal dari angka biner 101?",
-                options: ["3", "5", "6", "4"],
-                answer: "5"
-            },
-            {
-                title: "Level 2: Gerbang Logika",
-                question: "Jika A = True (1) dan B = False (0), berapakah hasil dari operasi logika (A AND B)?",
-                options: ["True", "False"],
-                answer: "False"
-            },
-            {
-                title: "Level 3: Jaringan Komputer",
-                question: "Perangkat jaringan mana yang berfungsi untuk meneruskan paket data antar jaringan berbeda (termasuk ke internet)?",
-                options: ["Switch", "Hub", "Router", "Kabel UTP"],
-                answer: "Router"
-            },
-            {
-                title: "Level 4: Algoritma Dasar",
-                question: "Manakah urutan langkah logis (algoritma) yang benar saat menyalakan komputer?",
-                options: [
-                    "Tekan tombol power -> Hubungkan ke listrik -> Tunggu OS loading",
-                    "Hubungkan ke listrik -> Tekan tombol power -> Tunggu OS loading",
-                    "Tunggu OS loading -> Hubungkan ke listrik -> Tekan tombol power"
-                ],
-                answer: "Hubungkan ke listrik -> Tekan tombol power -> Tunggu OS loading"
-            }
-        ];
+        // Data Nilai Siswa Lengkap (45 Siswa)
+        const STUDENT_DATABASE = {
+            "Adinda Siti Mutia Arrazi": 88,
+            "Alika Aulia Musfiroh": 76,
+            "Almira Fadhlika": 64,
+            "Amira Fitria": 83,
+            "Andara Putri Pratama Yusuf": 83,
+            "Andara Regina putri": 64,
+            "anindya fakhrunnisa": 90,
+            "Anjani Azaria Wafa": 81,
+            "arsy fitriasari": 76,
+            "Auladhya Banat": 71,
+            "Aura Shalma": 81,
+            "devina Salsabila": 71,
+            "Hesti Avrilisiana": 71,
+            "Jihan Nur Azizah": 42,
+            "keylaoktaviana apple_user": 59,
+            "Kharira Kekey": 74,
+            "Livia aryani sopyan Aryani": 74,
+            "Maisya Aqiilah": 83,
+            "MEILDA CAHYA KIRANI": 78,
+            "Nadia Aurora P.": 86,
+            "nadien anastasya": 59,
+            "Nadila putri": 83,
+            "Naysa Putri": 74,
+            "Nazwa Dewi": 47,
+            "Nur Nazma Khitunnisa": 57,
+            "Pelita Noviyanti": 71,
+            "Princessa Gracellaa": 83,
+            "Putri Ala": 78,
+            "Putri Meilani": 45,
+            "Qinly Biuty": 47,
+            "ratih destia": 81,
+            "Salsa Bila": 57,
+            "Shafa nur awaliyah": 71,
+            "sheren septiani": 45,
+            "sindi sonia oktaviawati": 76,
+            "Siti Fatimah": 54,
+            "Siti Khumaira": 71,
+            "siti syahwa": 71,
+            "Sumayyah Saadah Susandi": 57,
+            "Syaima Nasya": 78,
+            "Yuniar Kusumawati": 71,
+            "zahira aulia ramadhani": 54,
+            "Zaira Oktoviani": 78,
+            "Zalfa Syafira": 71,
+            "zulfa Siti gaisa": 71
+        };
 
-        let currentLevel = 0;
-        let score = 0;
-        let playerName = "";
+        const LOCAL_STORAGE_KEY = 'gradeCheckCount_v1';
+        const LOCAL_STORAGE_CHECKED_DATA = 'gradeCheckData_v1';
 
-        function startGame() {
-            const nameInput = document.getElementById("player-name").value.trim();
-            if (!nameInput) {
-                alert("Harap masukkan nama Anda terlebih dahulu!");
-                return;
-            }
-            playerName = nameInput;
-            currentLevel = 0;
-            score = 0;
-            
-            document.getElementById("start-screen").classList.add("hidden");
-            document.getElementById("game-screen").classList.remove("hidden");
-            loadQuestion();
-        }
+        let targetStudent = null;
 
-        function loadQuestion() {
-            if (currentLevel >= levels.length) {
-                document.getElementById("game-screen").innerHTML = `
-                    <h2>Selamat, ${playerName}! 🎉</h2>
-                    <p>Anda telah berhasil menyelesaikan semua level informatika dasar!</p>
-                    <p><b>Total Skor Akhir: ${score}</b></p>
-                    <button onclick="location.reload()">Main Lagi</button>
+        // Initialize state on page load
+        window.onload = function() {
+            checkAndApplyState();
+        };
+
+        function checkAndApplyState() {
+            const checkCount = parseInt(localStorage.getItem(LOCAL_STORAGE_KEY) || "0", 10);
+            const savedData = JSON.parse(localStorage.getItem(LOCAL_STORAGE_CHECKED_DATA) || "null");
+
+            const quotaBadge = document.getElementById('quotaBadge');
+            const searchInput = document.getElementById('studentSearchInput');
+            const btnSubmitSearch = document.getElementById('btnSubmitSearch');
+            const resultContainer = document.getElementById('resultContainer');
+            const statusNoticeBanner = document.getElementById('statusNoticeBanner');
+
+            if (checkCount >= 1 && savedData) {
+                // LOCK STATE
+                quotaBadge.className = "flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-bold bg-rose-500/20 text-rose-200 border border-rose-400/30";
+                quotaBadge.innerHTML = `<i class="fa-solid fa-lock text-rose-300"></i> <span>Sisa Kesempatan: 0/1 (Kesempatan Habis)</span>`;
+
+                searchInput.value = savedData.name;
+                searchInput.disabled = true;
+                btnSubmitSearch.disabled = true;
+
+                statusNoticeBanner.className = "bg-rose-50 border-l-4 border-rose-500 p-4 rounded-r-xl shadow-sm text-rose-900 text-sm flex items-start gap-3";
+                statusNoticeBanner.innerHTML = `
+                    <i class="fa-solid fa-lock text-rose-600 text-xl mt-0.5 flex-shrink-0"></i>
+                    <div>
+                        <strong class="font-bold block text-rose-950 mb-0.5">BATAS KESEMPATAN TELAH HABIS</strong>
+                        Anda telah menggunakan 1x hak pengecekan nilai untuk <strong>${savedData.name}</strong>. Form pencarian telah dikunci dan tidak dapat digunakan lagi.
+                    </div>
                 `;
-                return;
-            }
 
-            const lvl = levels[currentLevel];
-            document.getElementById("display-level").innerText = `Level: ${currentLevel + 1} / ${levels.length}`;
-            document.getElementById("display-score").innerText = `Skor: ${score}`;
-            document.getElementById("question-title").innerText = lvl.title;
-            document.getElementById("question-text").innerText = lvl.question;
+                // Render Result Card for locked state
+                renderResultCard(savedData.name, savedData.grade, savedData.timestamp, true);
+                resultContainer.classList.remove('hidden');
 
-            const optContainer = document.getElementById("options-container");
-            optContainer.innerHTML = "";
-            
-            lvl.options.forEach(opt => {
-                const btn = document.createElement("button");
-                btn.innerText = opt;
-                btn.className = "option-btn";
-                btn.onclick = () => checkAnswer(opt);
-                optContainer.appendChild(btn);
-            });
-        }
-
-        function checkAnswer(selectedOption) {
-            const lvl = levels[currentLevel];
-            if (selectedOption === lvl.answer) {
-                alert("Jawaban Benar! 🎉");
-                score += 25;
-                currentLevel++;
-                loadQuestion();
             } else {
-                alert("Jawaban Kurang Tepat. Coba pikirkan lagi!");
+                // UNLOCKED STATE (1/1 Remaining)
+                quotaBadge.className = "flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-bold bg-emerald-500/20 text-emerald-200 border border-emerald-400/30";
+                quotaBadge.innerHTML = `<i class="fa-solid fa-shield-check text-emerald-300"></i> <span>Sisa Kesempatan: 1/1</span>`;
+
+                searchInput.disabled = false;
+                btnSubmitSearch.disabled = false;
+                resultContainer.classList.add('hidden');
             }
         }
 
-        // Fitur Save Game menggunakan localStorage browser
-        function saveGame() {
-            const saveData = {
-                playerName: playerName,
-                currentLevel: currentLevel,
-                score: score
-            };
-            localStorage.setItem("informaticsQuestSave", JSON.stringify(saveData));
-            alert("Progress game berhasil disimpan! 💾");
-        }
+        function handleInputSearch(val) {
+            const dropdown = document.getElementById('autocompleteDropdown');
+            const query = val.trim().toLowerCase();
 
-        // Fitur Load Game dari localStorage browser
-        function loadGame() {
-            const savedDataStr = localStorage.getItem("informaticsQuestSave");
-            if (!savedDataStr) {
-                alert("Tidak ada data save yang ditemukan!");
+            if (!query) {
+                dropdown.classList.add('hidden');
                 return;
             }
-            
-            const saveData = JSON.parse(savedDataStr);
-            playerName = saveData.playerName;
-            currentLevel = saveData.currentLevel;
-            score = saveData.score;
 
-            document.getElementById("start-screen").classList.add("hidden");
-            document.getElementById("game-screen").classList.remove("hidden");
-            alert(`Selamat datang kembali, ${playerName}! Melanjutkan dari Level ${currentLevel + 1}.`);
-            loadQuestion();
+            const studentNames = Object.keys(STUDENT_DATABASE);
+            const matches = studentNames.filter(name => name.toLowerCase().includes(query));
+
+            if (matches.length === 0) {
+                dropdown.innerHTML = `
+                    <div class="px-4 py-3 text-xs text-slate-400 italic text-center">
+                        Siswa tidak ditemukan dalam daftar 45 siswa
+                    </div>`;
+                dropdown.classList.remove('hidden');
+                return;
+            }
+
+            dropdown.innerHTML = matches.map(name => {
+                return `
+                    <div 
+                        onclick="selectAutocomplete('${escapeQuotes(name)}')"
+                        class="px-4 py-3 hover:bg-indigo-50 cursor-pointer flex items-center justify-between transition-colors text-sm font-medium text-slate-800"
+                    >
+                        <span>${highlightMatch(name, query)}</span>
+                        <i class="fa-solid fa-chevron-right text-xs text-slate-300"></i>
+                    </div>
+                `;
+            }).join('');
+
+            dropdown.classList.remove('hidden');
         }
+
+        function highlightMatch(text, query) {
+            const idx = text.toLowerCase().indexOf(query.toLowerCase());
+            if (idx === -1) return text;
+            const before = text.substring(0, idx);
+            const match = text.substring(idx, idx + query.length);
+            const after = text.substring(idx + query.length);
+            return `${before}<mark class="bg-indigo-100 text-indigo-900 font-bold rounded px-0.5">${match}</mark>${after}`;
+        }
+
+        function escapeQuotes(str) {
+            return str.replace(/'/g, "\\'");
+        }
+
+        function handleSearchKeyDown(e) {
+            if (e.key === 'Enter') {
+                triggerConfirmationModal();
+            }
+        }
+
+        function selectAutocomplete(studentName) {
+            document.getElementById('studentSearchInput').value = studentName;
+            document.getElementById('autocompleteDropdown').classList.add('hidden');
+            triggerConfirmationModal();
+        }
+
+        function triggerConfirmationModal() {
+            document.getElementById('autocompleteDropdown').classList.add('hidden');
+            const checkCount = parseInt(localStorage.getItem(LOCAL_STORAGE_KEY) || "0", 10);
+
+            if (checkCount >= 1) {
+                return; // Already locked
+            }
+
+            const inputVal = document.getElementById('studentSearchInput').value.trim();
+            if (!inputVal) {
+                return;
+            }
+
+            // Find match
+            const studentNames = Object.keys(STUDENT_DATABASE);
+            const match = studentNames.find(n => n.toLowerCase() === inputVal.toLowerCase());
+
+            if (!match) {
+                const resultContainer = document.getElementById('resultContainer');
+                resultContainer.innerHTML = `
+                    <div class="bg-rose-50 border border-rose-200 rounded-2xl p-6 text-center space-y-2">
+                        <div class="inline-flex p-3 bg-rose-100 text-rose-600 rounded-full">
+                            <i class="fa-solid fa-circle-xmark text-xl"></i>
+                        </div>
+                        <h4 class="text-base font-bold text-slate-800">Siswa Tidak Ditemukan</h4>
+                        <p class="text-xs text-slate-600">Nama "<strong>${inputVal}</strong>" tidak terdaftar. Pilih dari saran nama yang muncul saat mengetik.</p>
+                    </div>
+                `;
+                resultContainer.classList.remove('hidden');
+                return;
+            }
+
+            targetStudent = match;
+            document.getElementById('confirmStudentName').innerText = match;
+            document.getElementById('confirmModal').classList.remove('hidden');
+        }
+
+        function closeConfirmModal() {
+            document.getElementById('confirmModal').classList.add('hidden');
+        }
+
+        function executeGradeCheck() {
+            closeConfirmModal();
+            if (!targetStudent) return;
+
+            const grade = STUDENT_DATABASE[targetStudent];
+            const timestamp = new Date().toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' });
+
+            // Save state: Limit reached
+            localStorage.setItem(LOCAL_STORAGE_KEY, "1");
+            localStorage.setItem(LOCAL_STORAGE_CHECKED_DATA, JSON.stringify({
+                name: targetStudent,
+                grade: grade,
+                timestamp: timestamp
+            }));
+
+            // Re-apply state to lock UI
+            checkAndApplyState();
+        }
+
+        function renderResultCard(name, grade, timestamp, isLocked) {
+            const resultContainer = document.getElementById('resultContainer');
+
+            let gradeBadgeClass = 'text-emerald-600 bg-emerald-50 border-emerald-200';
+            if (grade < 60) {
+                gradeBadgeClass = 'text-rose-600 bg-rose-50 border-rose-200';
+            } else if (grade < 75) {
+                gradeBadgeClass = 'text-amber-600 bg-amber-50 border-amber-200';
+            }
+
+            resultContainer.innerHTML = `
+                <div class="bg-white rounded-2xl p-6 sm:p-8 shadow-md border border-slate-200 space-y-6 animate-in fade-in zoom-in-95 duration-200">
+                    
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b border-slate-100 pb-4">
+                        <div>
+                            <span class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-0.5">Hasil Pengecekan Terkunci</span>
+                            <h2 class="text-2xl font-extrabold text-slate-800">${name}</h2>
+                        </div>
+                        <span class="px-3 py-1 bg-rose-100 text-rose-800 text-xs font-bold rounded-full flex items-center gap-1.5 shadow-sm">
+                            <i class="fa-solid fa-lock"></i> Kesempatan Cek Telah Digunakan
+                        </span>
+                    </div>
+
+                    <div class="flex flex-col sm:flex-row items-center justify-between p-6 bg-slate-50 rounded-2xl border border-slate-200/80 gap-6">
+                        <div class="text-center sm:text-left space-y-1">
+                            <p class="text-xs text-slate-500 font-semibold">NILAI CAPAIAN SISWA</p>
+                            <p class="text-sm text-slate-700">Hasil Evaluasi Belajar Resmi</p>
+                            <p class="text-[11px] text-slate-400 font-mono pt-1"><i class="fa-solid fa-clock mr-1"></i> Diakses pada: ${timestamp}</p>
+                        </div>
+                        <div class="text-center">
+                            <div class="px-8 py-3.5 rounded-2xl border ${gradeBadgeClass} text-5xl font-black shadow-inner">
+                                ${grade}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-rose-50 border border-rose-200 text-rose-900 p-4 rounded-xl text-xs sm:text-sm flex items-start gap-3">
+                        <i class="fa-solid fa-circle-check text-rose-600 text-lg flex-shrink-0 mt-0.5"></i>
+                        <div>
+                            <strong>Pengecekan Selesai:</strong> Data nilai untuk <strong class="text-rose-950">${name}</strong> telah ditampilkan. Sesuai ketentuan, Anda tidak dapat melakukan pencarian ulang untuk nama siswa lain.
+                        </div>
+                    </div>
+
+                </div>
+            `;
+        }
+
+        function openResetModal() {
+            document.getElementById('resetModal').classList.remove('hidden');
+        }
+
+        function closeResetModal() {
+            document.getElementById('resetModal').classList.add('hidden');
+        }
+
+        function confirmResetDemo() {
+            localStorage.removeItem(LOCAL_STORAGE_KEY);
+            localStorage.removeItem(LOCAL_STORAGE_CHECKED_DATA);
+            closeResetModal();
+
+            document.getElementById('studentSearchInput').value = '';
+            document.getElementById('studentSearchInput').focus();
+
+            checkAndApplyState();
+        }
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(e) {
+            const dropdown = document.getElementById('autocompleteDropdown');
+            const searchInput = document.getElementById('studentSearchInput');
+            if (!dropdown.contains(e.target) && e.target !== searchInput) {
+                dropdown.classList.add('hidden');
+            }
+        });
     </script>
 </body>
 </html>
