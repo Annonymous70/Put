@@ -3,829 +3,744 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cek Nilai Siswa (1x Akses)</title>
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Fonts Inter -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                    },
-                }
-            }
-        }
-    </script>
+    <title>Tes Online TKA - Produk Kreatif dan Kewirausahaan (SMK)</title>
     <style>
-        .custom-scrollbar::-webkit-scrollbar {
-            width: 6px;
+        :root {
+            --primary-color: #1a365d;
+            --secondary-color: #2b6cb0;
+            --accent-color: #319795;
+            --bg-color: #f7fafc;
+            --card-bg: #ffffff;
+            --text-color: #2d3748;
+            --border-color: #e2e8f0;
+            --success-bg: #c6f6d5;
+            --success-text: #22543d;
+            --error-bg: #fed7d7;
+            --error-text: #742a2a;
         }
-        .custom-scrollbar::-webkit-scrollbar-track {
-            background: #f1f5f9;
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 30px 20px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            margin-bottom: 25px;
+        }
+
+        header h1 {
+            font-size: 1.8rem;
+            margin-bottom: 8px;
+        }
+
+        header p {
+            font-size: 1rem;
+            opacity: 0.9;
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--border-color);
+        }
+
+        .identity-form {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: var(--primary-color);
+            font-size: 0.9rem;
+        }
+
+        .form-group input, .form-group select {
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .form-group input:focus, .form-group select:focus {
+            border-color: var(--secondary-color);
+        }
+
+        .question-card {
+            border-left: 5px solid var(--secondary-color);
+        }
+
+        .question-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .badge {
+            background-color: #ebf8ff;
+            color: var(--secondary-color);
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .stimulus {
+            background-color: #edf2f7;
+            padding: 12px 15px;
+            border-radius: 6px;
+            font-size: 0.95rem;
+            margin-bottom: 15px;
+            border-left: 3px solid var(--accent-color);
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .option-label {
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            border: 1px solid var(--border-color);
             border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.2s, border-color 0.2s;
         }
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-            background: #cbd5e1;
+
+        .option-label:hover {
+            background-color: #f7fafc;
+            border-color: var(--secondary-color);
+        }
+
+        .option-label input[type="radio"], .option-label input[type="checkbox"] {
+            margin-right: 12px;
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 12px;
+        }
+
+        table th, table td {
+            border: 1px solid var(--border-color);
+            padding: 10px;
+            text-align: left;
+            font-size: 0.95rem;
+        }
+
+        table th {
+            background-color: #edf2f7;
+            color: var(--primary-color);
+        }
+
+        table td input[type="radio"], table td input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .btn-submit {
+            display: block;
+            width: 100%;
+            background: linear-gradient(135deg, #2b6cb0, #2c5282);
+            color: white;
+            border: none;
+            padding: 15px;
+            font-size: 1.1rem;
+            font-weight: bold;
             border-radius: 8px;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+            transition: transform 0.1s, box-shadow 0.2s;
+            margin-top: 20px;
         }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-            background: #94a3b8;
+
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        #result-card {
+            display: none;
+            text-align: center;
+        }
+
+        .score-box {
+            font-size: 3rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            margin: 15px 0;
+        }
+
+        .feedback-list {
+            text-align: left;
+            margin-top: 20px;
+        }
+
+        .feedback-item {
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 10px;
+            font-size: 0.95rem;
+        }
+
+        .feedback-success {
+            background-color: var(--success-bg);
+            color: var(--success-text);
+        }
+
+        .feedback-error {
+            background-color: var(--error-bg);
+            color: var(--error-text);
+        }
+
+        @media (max-width: 600px) {
+            body { padding: 10px; }
+            .card { padding: 15px; }
+            header h1 { font-size: 1.4rem; }
         }
     </style>
 </head>
-<body class="bg-slate-100 font-sans text-slate-800 min-h-screen flex flex-col justify-between selection:bg-indigo-500 selection:text-white">
+<body>
 
-    <!-- Header Navbar -->
-    <header class="bg-indigo-700 text-white shadow-md sticky top-0 z-30">
-        <div class="max-w-5xl mx-auto px-4 sm:px-6 py-4 flex flex-col sm:flex-row justify-between items-center gap-3">
-            <div class="flex items-center space-x-3 w-full sm:w-auto justify-between sm:justify-start">
-                <div class="flex items-center space-x-3">
-                    <div class="p-2.5 bg-indigo-600 rounded-xl shadow-inner text-indigo-100">
-                        <i class="fa-solid fa-graduation-cap text-2xl"></i>
-                    </div>
-                    <div>
-                        <h1 class="text-lg sm:text-xl font-bold tracking-tight">Portal Nilai Siswa</h1>
-                        <p class="text-xs text-indigo-200">Sistem Evaluasi Terkunci (Batas 1x Cek)</p>
-                    </div>
-                </div>
-                
-                <!-- Dynamic Quota Badge Mobile -->
-                <div id="quotaBadgeMobile" class="sm:hidden flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold transition-all">
-                    <!-- JS populate -->
-                </div>
-            </div>
-
-            <div class="flex items-center space-x-3 w-full sm:w-auto justify-between sm:justify-end">
-                <!-- Dynamic Quota Badge Desktop -->
-                <div id="quotaBadge" class="hidden sm:flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-bold transition-all shadow-sm">
-                    <!-- JS populate -->
-                </div>
-            </div>
-        </div>
-
-        <!-- Navigation Tabs -->
-        <div class="max-w-5xl mx-auto px-4 sm:px-6 border-t border-indigo-600/60 flex space-x-1">
-            <button 
-                id="tabBtnSearch" 
-                onclick="switchTab('search')" 
-                class="px-4 py-2.5 text-xs sm:text-sm font-semibold border-b-2 border-white text-white flex items-center gap-2 transition-all"
-            >
-                <i class="fa-solid fa-magnifying-glass"></i>
-                <span>Cari Nilai Siswa</span>
-            </button>
-            <button 
-                id="tabBtnList" 
-                onclick="switchTab('list')" 
-                class="px-4 py-2.5 text-xs sm:text-sm font-medium border-b-2 border-transparent text-indigo-200 hover:text-white flex items-center gap-2 transition-all"
-            >
-                <i class="fa-solid fa-users"></i>
-                <span>Daftar Nama Siswa (86)</span>
-            </button>
-        </div>
+<div class="container">
+    <header>
+        <h1>TES KEMAMPUAN AKADEMIK (TKA) ONLINE</h1>
+        <p>Mata Pelajaran: Produk atau Projek Kreatif dan Kewirausahaan (SMK)</p>
+        <p style="font-size: 0.85rem; margin-top: 5px; opacity: 0.8;">Pusat Asesmen Pendidikan - Kementerian Pendidikan Dasar dan Menengah</p>
     </header>
 
-    <!-- Main Content Container -->
-    <main class="max-w-5xl mx-auto px-4 sm:px-6 py-6 flex-grow w-full space-y-6">
-
-        <!-- Toast Alert Banner for System Notifications -->
-        <div id="toastNotification" class="hidden transition-all duration-300 transform">
-            <!-- JS populated -->
-        </div>
-
-        <!-- TAB 1: CARI NILAI -->
-        <div id="tabSearchContent" class="space-y-6">
-            
-            <!-- Notice Alert Banner -->
-            <div id="statusNoticeBanner" class="bg-amber-50 border-l-4 border-amber-500 p-4 rounded-r-xl shadow-sm text-amber-900 text-sm flex items-start gap-3">
-                <i class="fa-solid fa-triangle-exclamation text-amber-500 text-xl mt-0.5 flex-shrink-0"></i>
-                <div>
-                    <strong class="font-bold block text-amber-950 mb-0.5">PERATURAN PENTING: KHUSUS 1 KALI CEK</strong>
-                    Setiap pengguna **HANYA MEMILIKI 1 KALI KESEMPATAN** untuk mengecek nilai siswa. Setelah dikonfirmasi, form pencarian akan **langsung terkunci secara permanen** pada perangkat ini.
-                </div>
+    <!-- FORM IDENTITAS -->
+    <div class="card" id="identity-card">
+        <h2 style="color: var(--primary-color); font-size: 1.2rem; margin-bottom: 10px;">Identitas Peserta Ujian</h2>
+        <div class="identity-form">
+            <div class="form-group">
+                <label for="nama">Nama Lengkap Siswa</label>
+                <input type="text" id="nama" placeholder="Masukkan nama lengkap" required>
             </div>
-
-            <!-- Search Card Box -->
-            <div class="bg-white p-6 sm:p-8 rounded-2xl shadow-sm border border-slate-200 space-y-4 relative">
-                <label for="studentSearchInput" class="block text-sm font-bold text-slate-700">
-                    Pilih atau Ketik Nama Siswa
-                </label>
-
-                <div class="relative">
-                    <div class="relative flex items-center">
-                        <i class="fa-solid fa-user-tag absolute left-4 text-slate-400"></i>
-                        <input 
-                            type="text" 
-                            id="studentSearchInput" 
-                            autocomplete="off"
-                            placeholder="Ketik nama siswa (contoh: Adinda, Anindya, Siti...)"
-                            class="w-full pl-11 pr-28 py-3.5 bg-slate-50 border border-slate-300 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all text-slate-800 font-medium text-base placeholder-slate-400 disabled:bg-slate-100 disabled:text-slate-400 disabled:cursor-not-allowed"
-                            oninput="handleInputSearch(this.value)"
-                            onkeydown="handleSearchKeyDown(event)"
-                        >
-                        <button 
-                            id="btnSubmitSearch" 
-                            onclick="triggerConfirmationModal()" 
-                            class="absolute right-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white font-semibold text-sm rounded-lg shadow-sm transition-colors disabled:bg-slate-300 disabled:cursor-not-allowed flex items-center gap-1.5"
-                        >
-                            <span>Cari Nilai</span>
-                            <i class="fa-solid fa-arrow-right text-xs"></i>
-                        </button>
-                    </div>
-
-                    <!-- Autocomplete Dropdown List -->
-                    <div id="autocompleteDropdown" class="hidden absolute z-20 left-0 right-0 mt-2 bg-white rounded-xl shadow-xl border border-slate-200 max-h-60 overflow-y-auto custom-scrollbar divide-y divide-slate-100">
-                        <!-- Items rendered via JS -->
-                    </div>
-                </div>
-
-                <!-- Hint Text -->
-                <div class="flex flex-wrap items-center justify-between text-xs text-slate-500 pt-1">
-                    <span><i class="fa-solid fa-circle-info mr-1 text-indigo-500"></i> Ketik minimal 1 huruf untuk melihat rekomendasi nama.</span>
-                    <span class="text-slate-400 font-medium">Total 45 Siswa Terdaftar</span>
-                </div>
+            <div class="form-group">
+                <label for="kelas">Kelas / Keahlian</label>
+                <input type="text" id="kelas" placeholder="Contoh: XII RPL 1" required>
             </div>
-
-            <!-- Locked Message / Result Display Area -->
-            <div id="resultContainer" class="hidden transition-all duration-300">
-                <!-- Populated via JS -->
-            </div>
-
-            <!-- Class Statistics Cards -->
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
-                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-4">
-                    <div class="p-3 bg-indigo-50 text-indigo-600 rounded-xl">
-                        <i class="fa-solid fa-users-viewfinder text-2xl"></i>
-                    </div>
-                    <div>
-                        <p class="text-xs font-semibold text-slate-400 uppercase">Total Siswa</p>
-                        <p class="text-xl font-extrabold text-slate-800">45 Siswa</p>
-                    </div>
-                </div>
-                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-4">
-                    <div class="p-3 bg-emerald-50 text-emerald-600 rounded-xl">
-                        <i class="fa-solid fa-chart-line text-2xl"></i>
-                    </div>
-                    <div>
-                        <p class="text-xs font-semibold text-slate-400 uppercase">Rata-Rata Nilai</p>
-                        <p class="text-xl font-extrabold text-slate-800">70.1</p>
-                    </div>
-                </div>
-                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-4">
-                    <div class="p-3 bg-amber-50 text-amber-600 rounded-xl">
-                        <i class="fa-solid fa-award text-2xl"></i>
-                    </div>
-                    <div>
-                        <p class="text-xs font-semibold text-slate-400 uppercase">Nilai Tertinggi</p>
-                        <p class="text-xl font-extrabold text-slate-800">90 (Anindya)</p>
-                    </div>
-                </div>
-            </div>
-
-        </div>
-
-        <!-- TAB 2: DAFTAR NAMA SISWA -->
-        <div id="tabListContent" class="hidden space-y-4">
-            <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
-                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b border-slate-100 pb-4">
-                    <div>
-                        <h2 class="text-lg font-bold text-slate-800">Daftar Terverifikasi Siswa</h2>
-                        <p class="text-xs text-slate-500">Gunakan fitur ini untuk mengecek nama siswa yang terdaftar di database.</p>
-                    </div>
-                    <!-- Quick Filter Input -->
-                    <div class="relative w-full sm:w-64">
-                        <i class="fa-solid fa-filter absolute left-3 top-3 text-slate-400 text-xs"></i>
-                        <input 
-                            type="text" 
-                            id="directoryFilterInput" 
-                            placeholder="Saring nama siswa..."
-                            oninput="filterStudentList(this.value)"
-                            class="w-full pl-8 pr-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                        >
-                    </div>
-                </div>
-
-                <!-- Table Container -->
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left text-sm text-slate-600">
-                        <thead class="bg-slate-50 text-xs text-slate-500 uppercase font-semibold border-b border-slate-200">
-                            <tr>
-                                <th class="px-4 py-3">No</th>
-                                <th class="px-4 py-3">Nama Siswa</th>
-                                <th class="px-4 py-3 text-center">Status Data</th>
-                                <th class="px-4 py-3 text-right">Aksi</th>
-                            </tr>
-                        </thead>
-                        <tbody id="studentTableBody" class="divide-y divide-slate-100">
-                            <!-- Populated via JS -->
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
-    </main>
-
-    <!-- Modal 1: Confirmation Before 1x Check -->
-    <div id="confirmModal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 space-y-5 transform transition-all animate-in fade-in zoom-in-95">
-            <div class="flex items-center gap-3.5 text-amber-600">
-                <div class="p-3 bg-amber-100 rounded-2xl">
-                    <i class="fa-solid fa-shield-cat text-2xl"></i>
-                </div>
-                <div>
-                    <h3 class="text-lg font-bold text-slate-800">Konfirmasi 1x Kesempatan</h3>
-                    <p class="text-xs text-slate-500">Perhatikan: Kesempatan tidak bisa diulang!</p>
-                </div>
-            </div>
-
-            <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 text-xs sm:text-sm text-amber-900 leading-relaxed">
-                Anda akan melihat nilai untuk:<br>
-                <strong id="confirmStudentName" class="text-base text-indigo-900 font-bold block my-1">...</strong>
-                Inilah **SATU-SATUNYA** kesempatan Anda untuk melihat nilai. Setelah mengecek, Anda **TIDAK BISA** lagi memilih atau melihat nama siswa lain.
-            </div>
-
-            <div class="flex items-center justify-end gap-3 pt-1">
-                <button 
-                    onclick="closeConfirmModal()" 
-                    class="px-4 py-2.5 text-xs sm:text-sm font-semibold text-slate-600 hover:bg-slate-100 rounded-xl transition-colors"
-                >
-                    Batal / Ganti Nama
-                </button>
-                <button 
-                    onclick="executeGradeCheck()" 
-                    class="px-5 py-2.5 text-xs sm:text-sm font-bold bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl shadow-md transition-all flex items-center gap-2"
-                >
-                    <i class="fa-solid fa-check"></i>
-                    <span>Ya, Lihat Nilai Sekarang</span>
-                </button>
+            <div class="form-group">
+                <label for="nisn">Nomor Induk Siswa (NISN)</label>
+                <input type="text" id="nisn" placeholder="Masukkan NISN" required>
             </div>
         </div>
     </div>
 
-    <!-- Modal 2: Reset Admin Protection (Code: AdminInformatika) -->
-    <div id="adminResetModal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 space-y-4">
-            <div class="flex items-center justify-between border-b border-slate-100 pb-3">
-                <div class="flex items-center gap-3 text-indigo-600">
-                    <div class="p-2.5 bg-indigo-100 rounded-xl">
-                        <i class="fa-solid fa-key text-xl"></i>
-                    </div>
-                    <div>
-                        <h3 class="text-base font-bold text-slate-800">Reset Sistem (Khusus Admin)</h3>
-                        <p class="text-xs text-slate-500">Otentikasi Pengurus Informatika</p>
-                    </div>
-                </div>
-                <button onclick="closeAdminResetModal()" class="text-slate-400 hover:text-slate-600 text-lg">
-                    <i class="fa-solid fa-xmark"></i>
-                </button>
+    <!-- FORM SOAL -->
+    <form id="quizForm">
+
+        <!-- SOAL 1 -->
+        <div class="card question-card">
+            <div class="question-title">
+                <span>Soal Nomor 1</span>
+                <span class="badge">Pilihan Ganda</span>
             </div>
-
-            <p class="text-xs sm:text-sm text-slate-600 leading-relaxed">
-                Masukkan Kode Keamanan Admin untuk membuka kunci form pencarian dan memulihkan sisa kesempatan menjadi <strong>1/1</strong>.
-            </p>
-
-            <div class="space-y-2">
-                <label for="adminPasscodeInput" class="block text-xs font-bold text-slate-700 uppercase">
-                    Kode Akses Admin
+            <div class="stimulus">
+                <strong>Stimulus:</strong> Kantin Sekolah "Ayam Segar Sehat" mendapat kesempatan menjual produknya di minimarket lokal. Namun, persyaratannya adalah produk harus menggunakan kemasan dan label yang sesuai standar minimarket.
+            </div>
+            <p style="margin-bottom: 12px; font-weight: 600;">Manakah elemen label yang paling tepat ditambahkan pada kemasan untuk memenuhi kriteria minimarket?</p>
+            <div class="options">
+                <label class="option-label">
+                    <input type="radio" name="q1" value="A">
+                    A. Komposisi bahan, tanggal kedaluwarsa, dan nomor izin PIRT/BPOM
                 </label>
-                <div class="relative">
-                    <input 
-                        type="password" 
-                        id="adminPasscodeInput" 
-                        placeholder="Masukkan kode admin..."
-                        class="w-full px-4 py-2.5 bg-slate-50 border border-slate-300 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm font-mono"
-                        onkeydown="if(event.key==='Enter') verifyAndExecuteReset()"
-                    >
-                    <button 
-                        type="button" 
-                        onclick="togglePasswordVisibility()" 
-                        class="absolute right-3 top-2.5 text-slate-400 hover:text-slate-600 text-sm"
-                    >
-                        <i id="togglePassIcon" class="fa-solid fa-eye"></i>
-                    </button>
-                </div>
-                <!-- Error Message Display -->
-                <p id="adminErrorMsg" class="hidden text-xs font-semibold text-rose-600 flex items-center gap-1 mt-1">
-                    <i class="fa-solid fa-circle-exclamation"></i>
-                    <span>Kode Admin Salah! Akses ditolak.</span>
-                </p>
-            </div>
-
-            <div class="flex justify-end gap-2.5 pt-3 border-t border-slate-100">
-                <button 
-                    onclick="closeAdminResetModal()" 
-                    class="px-4 py-2 text-xs sm:text-sm font-semibold text-slate-600 hover:bg-slate-100 rounded-xl transition-colors"
-                >
-                    Batal
-                </button>
-                <button 
-                    onclick="verifyAndExecuteReset()" 
-                    class="px-4 py-2 text-xs sm:text-sm font-bold bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl shadow-md transition-all flex items-center gap-1.5"
-                >
-                    <i class="fa-solid fa-rotate"></i>
-                    <span>Verifikasi & Reset</span>
-                </button>
+                <label class="option-label">
+                    <input type="radio" name="q1" value="B">
+                    B. Daftar keluhan pelanggan, nomor kontak pribadi owner, dan garansi refund
+                </label>
+                <label class="option-label">
+                    <input type="radio" name="q1" value="C">
+                    C. Denah lokasi kantin, daftar promo mingguan, dan foto seluruh staf kantin
+                </label>
+                <label class="option-label">
+                    <input type="radio" name="q1" value="D">
+                    D. Sertifikat prestasi sekolah, barcode kasir internal kantin, dan resep rahasia
+                </label>
             </div>
         </div>
-    </div>
 
-    <!-- Footer -->
-    <footer class="bg-white border-t border-slate-200 py-6 text-center text-xs text-slate-500 space-y-3 mt-auto">
-        <p>© 2026 Portal Nilai Siswa — Sistem Evaluasi Terkunci (Batasan Akses Strict 1x)</p>
-        <div>
-            <button 
-                onclick="openAdminResetModal()" 
-                class="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-bold text-slate-600 hover:text-indigo-700 hover:bg-indigo-50 rounded-xl transition-all border border-slate-300 shadow-sm"
-            >
-                <i class="fa-solid fa-lock-open text-indigo-600"></i>
-                <span>Reset Sistem (Admin)</span>
-            </button>
+        <!-- SOAL 2 -->
+        <div class="card question-card">
+            <div class="question-title">
+                <span>Soal Nomor 2</span>
+                <span class="badge">Pilihan Ganda</span>
+            </div>
+            <div class="stimulus">
+                <strong>Stimulus:</strong> Sekolah SMK X berencana membuat produk kerajinan tas belanja dari limbah plastik. Proposal usaha menyajikan visualisasi produk menarik dan analisis pasar, namun belum mencantumkan proyeksi keuangan secara detail.
+            </div>
+            <p style="margin-bottom: 12px; font-weight: 600;">Berdasarkan analisis proposal tersebut, aspek apa yang paling krusial untuk ditambahkan agar proposal layak bagi investor?</p>
+            <div class="options">
+                <label class="option-label">
+                    <input type="radio" name="q2" value="A">
+                    A. Penambahan desain logo yang lebih modern dan variatif
+                </label>
+                <label class="option-label">
+                    <input type="radio" name="q2" value="B">
+                    B. Pembuatan video promosi berdurasi panjang mengenai proses pembuatan
+                </label>
+                <label class="option-label">
+                    <input type="radio" name="q2" value="C">
+                    C. Penambahan daftar riwayat hidup seluruh siswa yang terlibat
+                </label>
+                <label class="option-label">
+                    <input type="radio" name="q2" value="D">
+                    D. Rincian proyeksi keuangan, estimasi modal awal, BEP, dan ROI
+                </label>
+            </div>
         </div>
-    </footer>
 
-    <script>
-        // Data Siswa Lengkap (86 Siswa)
-        const STUDENT_DATABASE = {
-            "Adinda Siti Mutia Arrazi": 88,
-            "Alika Aulia Musfiroh": 76,
-            "Almira Fadhlika": 64,
-            "Amira Fitria": 83,
-            "Andara Putri Pratama Yusuf": 83,
-            "Andara Regina putri": 64,
-            "anindya fakhrunnisa": 90,
-            "Anjani Azaria Wafa": 81,
-            "arsy fitriasari": 76,
-            "Auladhya Banat": 71,
-            "Aura Shalma": 81,
-            "devina Salsabila": 71,
-            "Hesti Avrilisiana": 71,
-            "Jihan Nur Azizah": 42,
-            "keylaoktaviana apple_user": 59,
-            "Kharira Kekey": 74,
-            "Livia aryani sopyan Aryani": 74,
-            "Maisya Aqiilah": 83,
-            "MEILDA CAHYA KIRANI": 78,
-            "Nadia Aurora P.": 86,
-            "nadien anastasya": 59,
-            "Nadila putri": 83,
-            "Naysa Putri": 74,
-            "Nazwa Dewi": 47,
-            "Nur Nazma Khitunnisa": 57,
-            "Pelita Noviyanti": 71,
-            "Princessa Gracellaa": 83,
-            "Putri Ala": 78,
-            "Putri Meilani": 45,
-            "Qinly Biuty": 47,
-            "ratih destia": 81,
-            "Salsa Bila": 57,
-            "Shafa nur awaliyah": 71,
-            "sheren septiani": 45,
-            "sindi sonia oktaviawati": 76,
-            "Siti Fatimah": 54,
-            "Siti Khumaira": 71,
-            "siti syahwa": 71,
-            "Sumayyah Saadah Susandi": 57,
-            "Syaima Nasya": 78,
-            "Yuniar Kusumawati": 71,
-            "zahira aulia ramadhani": 54,
-            "Zaira Oktoviani": 78,
-            "Zalfa Syafira": 71,
-            "zulfa Siti gaisa": 71,
-            "aira safitri": 92,
-            "almiraa": 88,
-            "amelia syifa": 85,
-            "Amira S": 83,
-            "Andara nurfitria Ruslan": 76,
-            "andini salya": 83,
-            "Anggiapratamiputri": 3,
-            "dafina AddzahraMaulida": 80,
-            "Damar wulan": 80,
-            "desta destriana": 82,
-            "elsa purnama sari": 75,
-            "helizia": 73,
-            "Indah Devita": 82,
-            "Khalila Dewantari": 80,
-            "Khoirunniza aulia putri": 80,
-            "Melati Ramadhani": 76,
-            "najwa kh": 85,
-            "Nasya Dwi citra nera": 71,
-            "Naura Jasmine alqueenzha n": 80,
-            "Naysha widiasari": 76,
-            "Neng hanan Maulida": 83,
-            "Nurani julienma": 76,
-            "NURI NASRIAH": 83,
-            "Putri asmaul husna": 71,
-            "putri cahya kirana": 78,
-            "Putri R": 83,
-            "Quinsha": 76,
-            "Reyne Adzkia": 85,
-            "RIRIS TRI WARDANI": 88,
-            "safa dlia": 83,
-            "Salhabila": 90,
-            "Saqila Zalfa": 71,
-            "Saskia khalifa": 66,
-            "Seruni deswita ruswandi": 85,
-            "Shafa Az-zahra": 40,
-            "shafa azzahra": 83,
-            "Shopie Zahra": 49,
-            "silvia aulia sari": 78,
-            "Siti Muyasharoh": 72,
-            "Siti Nuraeni": 73,
-            "Siti Rahmawati Siregar": 78
-        };
-
-        // Constants & Keys
-        const STORAGE_KEY_COUNT = 'nilai_akses_count';
-        const STORAGE_KEY_DATA = 'nilai_akses_data';
-        const ADMIN_PASSCODE = 'AdminInformatika';
-
-        let targetStudent = null;
-
-        // Initialize Application State on Page Load
-        window.onload = function() {
-            checkAndApplyState();
-            renderStudentTable();
-        };
-
-        // State Check Function
-        function checkAndApplyState() {
-            const checkCount = parseInt(localStorage.getItem(STORAGE_KEY_COUNT) || "0", 10);
-            const savedData = JSON.parse(localStorage.getItem(STORAGE_KEY_DATA) || "null");
-
-            const quotaBadge = document.getElementById('quotaBadge');
-            const quotaBadgeMobile = document.getElementById('quotaBadgeMobile');
-            const searchInput = document.getElementById('studentSearchInput');
-            const btnSubmitSearch = document.getElementById('btnSubmitSearch');
-            const resultContainer = document.getElementById('resultContainer');
-            const statusNoticeBanner = document.getElementById('statusNoticeBanner');
-
-            if (checkCount >= 1 && savedData) {
-                // LOCK STATE (0/1)
-                const lockedBadgeHTML = `<i class="fa-solid fa-lock text-rose-300"></i> <span>Sisa Kesempatan: 0/1 (Terkunci)</span>`;
-                const badgeClass = "bg-rose-500/20 text-rose-100 border border-rose-400/30";
-
-                quotaBadge.className = `hidden sm:flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-bold ${badgeClass}`;
-                quotaBadge.innerHTML = lockedBadgeHTML;
-
-                quotaBadgeMobile.className = `sm:hidden flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold ${badgeClass}`;
-                quotaBadgeMobile.innerHTML = lockedBadgeHTML;
-
-                searchInput.value = savedData.name;
-                searchInput.disabled = true;
-                btnSubmitSearch.disabled = true;
-
-                statusNoticeBanner.className = "bg-rose-50 border-l-4 border-rose-500 p-4 rounded-r-xl shadow-sm text-rose-900 text-sm flex items-start gap-3";
-                statusNoticeBanner.innerHTML = `
-                    <i class="fa-solid fa-lock text-rose-600 text-xl mt-0.5 flex-shrink-0"></i>
-                    <div>
-                        <strong class="font-bold block text-rose-950 mb-0.5">KESEMPATAN HABIS (TERKUNCI)</strong>
-                        Anda telah menggunakan 1x hak pengecekan nilai untuk <strong>${savedData.name}</strong>. Form pencarian telah dikunci.
-                    </div>
-                `;
-
-                // Render Result Card for locked state
-                renderResultCard(savedData.name, savedData.grade, savedData.timestamp);
-                resultContainer.classList.remove('hidden');
-
-            } else {
-                // UNLOCKED STATE (1/1)
-                const activeBadgeHTML = `<i class="fa-solid fa-shield-check text-emerald-300"></i> <span>Sisa Kesempatan: 1/1</span>`;
-                const badgeClass = "bg-emerald-500/20 text-emerald-100 border border-emerald-400/30";
-
-                quotaBadge.className = `hidden sm:flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-bold ${badgeClass}`;
-                quotaBadge.innerHTML = activeBadgeHTML;
-
-                quotaBadgeMobile.className = `sm:hidden flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold ${badgeClass}`;
-                quotaBadgeMobile.innerHTML = activeBadgeHTML;
-
-                searchInput.value = '';
-                searchInput.disabled = false;
-                btnSubmitSearch.disabled = false;
-
-                statusNoticeBanner.className = "bg-amber-50 border-l-4 border-amber-500 p-4 rounded-r-xl shadow-sm text-amber-900 text-sm flex items-start gap-3";
-                statusNoticeBanner.innerHTML = `
-                    <i class="fa-solid fa-triangle-exclamation text-amber-500 text-xl mt-0.5 flex-shrink-0"></i>
-                    <div>
-                        <strong class="font-bold block text-amber-950 mb-0.5">PERATURAN PENTING: KHUSUS 1 KALI CEK</strong>
-                        Setiap pengguna **HANYA MEMILIKI 1 KALI KESEMPATAN** untuk mengecek nilai siswa. Setelah dikonfirmasi, form pencarian akan **langsung terkunci secara permanen**.
-                    </div>
-                `;
-
-                resultContainer.classList.add('hidden');
-            }
-        }
-
-        function handleInputSearch(val) {
-            const dropdown = document.getElementById('autocompleteDropdown');
-            const query = val.trim().toLowerCase();
-
-            if (!query) {
-                dropdown.classList.add('hidden');
-                return;
-            }
-
-            const studentNames = Object.keys(STUDENT_DATABASE);
-            const matches = studentNames.filter(name => name.toLowerCase().includes(query));
-
-            if (matches.length === 0) {
-                dropdown.innerHTML = `
-                    <div class="px-4 py-3 text-xs text-slate-400 italic text-center">
-                        Siswa tidak ditemukan dalam daftar 45 siswa
-                    </div>`;
-                dropdown.classList.remove('hidden');
-                return;
-            }
-
-            dropdown.innerHTML = matches.map(name => {
-                return `
-                    <div 
-                        onclick="selectAutocomplete('${escapeQuotes(name)}')"
-                        class="px-4 py-3 hover:bg-indigo-50 cursor-pointer flex items-center justify-between transition-colors text-sm font-medium text-slate-800"
-                    >
-                        <span>${highlightMatch(name, query)}</span>
-                        <i class="fa-solid fa-arrow-up-left text-xs text-slate-300"></i>
-                    </div>
-                `;
-            }).join('');
-
-            dropdown.classList.remove('hidden');
-        }
-
-        function highlightMatch(text, query) {
-            const idx = text.toLowerCase().indexOf(query.toLowerCase());
-            if (idx === -1) return text;
-            const before = text.substring(0, idx);
-            const match = text.substring(idx, idx + query.length);
-            const after = text.substring(idx + query.length);
-            return `${before}<mark class="bg-indigo-100 text-indigo-900 font-bold rounded px-0.5">${match}</mark>${after}`;
-        }
-
-        function escapeQuotes(str) {
-            return str.replace(/'/g, "\\'");
-        }
-
-        function handleSearchKeyDown(e) {
-            if (e.key === 'Enter') {
-                triggerConfirmationModal();
-            }
-        }
-
-        function selectAutocomplete(studentName) {
-            document.getElementById('studentSearchInput').value = studentName;
-            document.getElementById('autocompleteDropdown').classList.add('hidden');
-            triggerConfirmationModal();
-        }
-
-        function triggerConfirmationModal() {
-            document.getElementById('autocompleteDropdown').classList.add('hidden');
-            const checkCount = parseInt(localStorage.getItem(STORAGE_KEY_COUNT) || "0", 10);
-
-            if (checkCount >= 1) return; // Locked
-
-            const inputVal = document.getElementById('studentSearchInput').value.trim();
-            if (!inputVal) return;
-
-            // Find exact case-insensitive match
-            const studentNames = Object.keys(STUDENT_DATABASE);
-            const match = studentNames.find(n => n.toLowerCase() === inputVal.toLowerCase());
-
-            if (!match) {
-                showToast("Nama siswa tidak ditemukan. Harap pilih dari pilihan autocomplete.", "error");
-                return;
-            }
-
-            targetStudent = match;
-            document.getElementById('confirmStudentName').innerText = match;
-            document.getElementById('confirmModal').classList.remove('hidden');
-        }
-
-        function closeConfirmModal() {
-            document.getElementById('confirmModal').classList.add('hidden');
-        }
-
-        function executeGradeCheck() {
-            closeConfirmModal();
-            if (!targetStudent) return;
-
-            const grade = STUDENT_DATABASE[targetStudent];
-            const timestamp = new Date().toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' });
-
-            // Store state in localStorage
-            localStorage.setItem(STORAGE_KEY_COUNT, "1");
-            localStorage.setItem(STORAGE_KEY_DATA, JSON.stringify({
-                name: targetStudent,
-                grade: grade,
-                timestamp: timestamp
-            }));
-
-            // Lock UI and render result
-            checkAndApplyState();
-            showToast(`Berhasil mengecek nilai untuk ${targetStudent}. Akses pencarian sekarang dikunci!`, "success");
-        }
-
-        function renderResultCard(name, grade, timestamp) {
-            const resultContainer = document.getElementById('resultContainer');
-
-            let gradeBadgeClass = 'text-emerald-600 bg-emerald-50 border-emerald-200';
-            let gradeLabel = 'Sangat Baik / Lulus';
-
-            if (grade < 60) {
-                gradeBadgeClass = 'text-rose-600 bg-rose-50 border-rose-200';
-                gradeLabel = 'Perlu Remedial';
-            } else if (grade < 75) {
-                gradeBadgeClass = 'text-amber-600 bg-amber-50 border-amber-200';
-                gradeLabel = 'Cukup / Cukup Baik';
-            }
-
-            resultContainer.innerHTML = `
-                <div class="bg-white rounded-2xl p-6 sm:p-8 shadow-md border border-slate-200 space-y-6 animate-in fade-in zoom-in-95 duration-200">
-                    
-                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b border-slate-100 pb-4">
-                        <div>
-                            <span class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-0.5">Hasil Pengecekan Resmi</span>
-                            <h2 class="text-2xl font-extrabold text-slate-800">${name}</h2>
-                        </div>
-                        <span class="px-3 py-1 bg-rose-100 text-rose-800 text-xs font-bold rounded-full flex items-center gap-1.5 shadow-sm">
-                            <i class="fa-solid fa-lock"></i> Sisa Akses: 0/1 (Terkunci)
-                        </span>
-                    </div>
-
-                    <div class="flex flex-col sm:flex-row items-center justify-between p-6 bg-slate-50 rounded-2xl border border-slate-200/80 gap-6">
-                        <div class="text-center sm:text-left space-y-1">
-                            <p class="text-xs text-slate-500 font-semibold uppercase">Nilai Capaian Belajar</p>
-                            <p class="text-sm font-semibold text-slate-700">${gradeLabel}</p>
-                            <p class="text-[11px] text-slate-400 font-mono pt-1"><i class="fa-solid fa-clock mr-1"></i> Waktu Akses: ${timestamp}</p>
-                        </div>
-                        <div class="text-center">
-                            <div class="px-8 py-3.5 rounded-2xl border ${gradeBadgeClass} text-5xl font-black shadow-inner">
-                                ${grade}
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="bg-indigo-50 border border-indigo-200 text-indigo-950 p-4 rounded-xl text-xs sm:text-sm flex items-start gap-3">
-                        <i class="fa-solid fa-shield-check text-indigo-600 text-lg flex-shrink-0 mt-0.5"></i>
-                        <div>
-                            <strong>Pengecekan Berhasil Terkunci:</strong> Anda telah selesai mengecek nilai untuk <strong class="text-indigo-900">${name}</strong>. Kesempatan mengecek siswa lain telah habis sesuai kebijakan sistem 1x akses.
-                        </div>
-                    </div>
-
-                </div>
-            `;
-        }
-
-        function openAdminResetModal() {
-            document.getElementById('adminPasscodeInput').value = '';
-            document.getElementById('adminErrorMsg').classList.add('hidden');
-            document.getElementById('adminResetModal').classList.remove('hidden');
-            setTimeout(() => document.getElementById('adminPasscodeInput').focus(), 100);
-        }
-
-        function closeAdminResetModal() {
-            document.getElementById('adminResetModal').classList.add('hidden');
-        }
-
-        function togglePasswordVisibility() {
-            const input = document.getElementById('adminPasscodeInput');
-            const icon = document.getElementById('togglePassIcon');
-            if (input.type === 'password') {
-                input.type = 'text';
-                icon.className = 'fa-solid fa-eye-slash';
-            } else {
-                input.type = 'password';
-                icon.className = 'fa-solid fa-eye';
-            }
-        }
-
-        function verifyAndExecuteReset() {
-            const inputCode = document.getElementById('adminPasscodeInput').value.trim();
-            const errorMsg = document.getElementById('adminErrorMsg');
-
-            if (inputCode === ADMIN_PASSCODE) {
-                // Correct Code! Reset storage keys
-                localStorage.removeItem(STORAGE_KEY_COUNT);
-                localStorage.removeItem(STORAGE_KEY_DATA);
-
-                closeAdminResetModal();
-                checkAndApplyState();
-                showToast("Sistem Berhasil Direset oleh Admin! Sisa kesempatan kembali menjadi 1/1.", "success");
-            } else {
-                // Wrong Code! Show error
-                errorMsg.classList.remove('hidden');
-                document.getElementById('adminPasscodeInput').focus();
-            }
-        }
-
-        function switchTab(tabName) {
-            const tabSearchContent = document.getElementById('tabSearchContent');
-            const tabListContent = document.getElementById('tabListContent');
-            const tabBtnSearch = document.getElementById('tabBtnSearch');
-            const tabBtnList = document.getElementById('tabBtnList');
-
-            if (tabName === 'search') {
-                tabSearchContent.classList.remove('hidden');
-                tabListContent.classList.add('hidden');
-
-                tabBtnSearch.className = "px-4 py-2.5 text-xs sm:text-sm font-semibold border-b-2 border-white text-white flex items-center gap-2 transition-all";
-                tabBtnList.className = "px-4 py-2.5 text-xs sm:text-sm font-medium border-b-2 border-transparent text-indigo-200 hover:text-white flex items-center gap-2 transition-all";
-            } else {
-                tabSearchContent.classList.add('hidden');
-                tabListContent.classList.remove('hidden');
-
-                tabBtnList.className = "px-4 py-2.5 text-xs sm:text-sm font-semibold border-b-2 border-white text-white flex items-center gap-2 transition-all";
-                tabBtnSearch.className = "px-4 py-2.5 text-xs sm:text-sm font-medium border-b-2 border-transparent text-indigo-200 hover:text-white flex items-center gap-2 transition-all";
-            }
-        }
-
-        function renderStudentTable(filterQuery = '') {
-            const tbody = document.getElementById('studentTableBody');
-            const studentNames = Object.keys(STUDENT_DATABASE);
-            const filtered = studentNames.filter(name => name.toLowerCase().includes(filterQuery.toLowerCase()));
-
-            if (filtered.length === 0) {
-                tbody.innerHTML = `
+        <!-- SOAL 3 -->
+        <div class="card question-card">
+            <div class="question-title">
+                <span>Soal Nomor 3</span>
+                <span class="badge">Pilihan Ganda Kompleks (PGK)</span>
+            </div>
+            <div class="stimulus">
+                <strong>Stimulus:</strong> Suatu UMKM kuliner lokal ingin meluncurkan produk sambal kemasan botol di tengah persaingan pasar yang ketat.
+            </div>
+            <p style="margin-bottom: 12px; font-weight: 600;">Tentukan apakah tindakan branding berikut BENAR atau SALAH dilakukan oleh UMKM tersebut!</p>
+            <table>
+                <thead>
                     <tr>
-                        <td colspan="4" class="px-4 py-6 text-center text-slate-400 italic">
-                            Tidak ada siswa yang cocok dengan kata kunci filter.
-                        </td>
+                        <th>Tindakan Branding</th>
+                        <th class="text-center" style="width: 100px;">Benar</th>
+                        <th class="text-center" style="width: 100px;">Salah</th>
                     </tr>
-                `;
-                return;
-            }
-
-            tbody.innerHTML = filtered.map((name, index) => {
-                return `
-                    <tr class="hover:bg-slate-50 transition-colors">
-                        <td class="px-4 py-3 text-xs font-mono text-slate-400">${index + 1}</td>
-                        <td class="px-4 py-3 font-semibold text-slate-800">${name}</td>
-                        <td class="px-4 py-3 text-center">
-                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-indigo-50 text-indigo-700 border border-indigo-100">
-                                <i class="fa-solid fa-circle-check text-[10px]"></i> Terdaftar
-                            </span>
-                        </td>
-                        <td class="px-4 py-3 text-right">
-                            <button 
-                                onclick="shortcutCheckStudent('${escapeQuotes(name)}')"
-                                class="px-3 py-1 bg-slate-100 hover:bg-indigo-600 hover:text-white text-slate-600 text-xs font-semibold rounded-lg transition-all border border-slate-200"
-                            >
-                                Pilih
-                            </button>
-                        </td>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>1. Menentukan nama merek yang unik, mudah diingat, dan mencerminkan cita rasa khas produk.</td>
+                        <td class="text-center"><input type="radio" name="q3_1" value="Benar"></td>
+                        <td class="text-center"><input type="radio" name="q3_1" value="Salah"></td>
                     </tr>
-                `;
-            }).join('');
+                    <tr>
+                        <td>2. Menggunakan desain logo dan warna kemasan yang identik dengan merek sambal ternama agar cepat dikenali.</td>
+                        <td class="text-center"><input type="radio" name="q3_2" value="Benar"></td>
+                        <td class="text-center"><input type="radio" name="q3_2" value="Salah"></td>
+                    </tr>
+                    <tr>
+                        <td>3. Menghentikan promosi dan mengganti nama merek secara berkala tanpa pemberitahuan kepada pelanggan.</td>
+                        <td class="text-center"><input type="radio" name="q3_3" value="Benar"></td>
+                        <td class="text-center"><input type="radio" name="q3_3" value="Salah"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- SOAL 4 -->
+        <div class="card question-card">
+            <div class="question-title">
+                <span>Soal Nomor 4</span>
+                <span class="badge">Pilihan Ganda Kompleks (Multi-Jawaban)</span>
+            </div>
+            <div class="stimulus">
+                <strong>Stimulus:</strong> Usaha katering sehat ingin mempromosikan menu terbarunya untuk remaja dan dewasa muda aktif dengan anggaran terbatas namun jangkauan luas.
+            </div>
+            <p style="margin-bottom: 12px; font-weight: 600;">Pilihlah kombinasi media promosi yang paling efektif! (Jawaban bisa lebih dari satu)</p>
+            <div class="options">
+                <label class="option-label">
+                    <input type="checkbox" name="q4" value="A">
+                    A. Memanfaatkan iklan tertarget di platform media sosial seperti Instagram dan TikTok
+                </label>
+                <label class="option-label">
+                    <input type="checkbox" name="q4" value="B">
+                    B. Bekerja sama dengan influencer/food blogger lokal yang memiliki pengikut sesuai target pasar
+                </label>
+                <label class="option-label">
+                    <input type="checkbox" name="q4" value="C">
+                    C. Menyebarkan brosur cetak secara acak di perempatan jalan raya
+                </label>
+                <label class="option-label">
+                    <input type="checkbox" name="q4" value="D">
+                    D. Memasang baliho besar di pusat kota dengan biaya sewa bulanan yang tinggi
+                </label>
+            </div>
+        </div>
+
+        <!-- SOAL 5 -->
+        <div class="card question-card">
+            <div class="question-title">
+                <span>Soal Nomor 5</span>
+                <span class="badge">Pilihan Ganda</span>
+            </div>
+            <div class="stimulus">
+                <strong>Stimulus:</strong> Tim siswa SMK jurusan RPL ingin membuat aplikasi pemesanan makanan berbasis mobile secara sistematis dan efisien.
+            </div>
+            <p style="margin-bottom: 12px; font-weight: 600;">Urutan tahapan proses produksi aplikasi yang paling tepat dan runtut adalah...</p>
+            <div class="options">
+                <label class="option-label">
+                    <input type="radio" name="q5" value="A">
+                    A. Pengujian aplikasi &rarr; Desain UI/UX &rarr; Perencanaan konsep &rarr; Peluncuran
+                </label>
+                <label class="option-label">
+                    <input type="radio" name="q5" value="B">
+                    B. Peluncuran aplikasi &rarr; Pengujian aplikasi &rarr; Coding &rarr; Analisis kebutuhan
+                </label>
+                <label class="option-label">
+                    <input type="radio" name="q5" value="C">
+                    C. Analisis kebutuhan & konsep &rarr; Desain UI/UX &rarr; Coding &rarr; Testing &rarr; Deployment
+                </label>
+                <label class="option-label">
+                    <input type="radio" name="q5" value="D">
+                    D. Coding &rarr; Pemasaran &rarr; Analisis kebutuhan &rarr; Pengujian
+                </label>
+            </div>
+        </div>
+
+        <!-- SOAL 6 -->
+        <div class="card question-card">
+            <div class="question-title">
+                <span>Soal Nomor 6</span>
+                <span class="badge">Pilihan Ganda Kompleks (PGK)</span>
+            </div>
+            <div class="stimulus">
+                <strong>Stimulus:</strong> Usaha "Mandal Food" memproduksi frozen food (nugget sayur, dimsum, bakso ikan) dan menetapkan perencanaan kapasitas produksi mingguan.
+            </div>
+            <p style="margin-bottom: 12px; font-weight: 600;">Tentukan apakah pernyataan perencanaan produksi berikut BENAR atau SALAH!</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Pernyataan Perencanaan Produksi</th>
+                        <th class="text-center" style="width: 100px;">Benar</th>
+                        <th class="text-center" style="width: 100px;">Salah</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>1. Penjadwalan bahan baku yang tepat waktu menjamin kelancaran alur produksi tanpa penumpukan stok.</td>
+                        <td class="text-center"><input type="radio" name="q6_1" value="Benar"></td>
+                        <td class="text-center"><input type="radio" name="q6_1" value="Salah"></td>
+                    </tr>
+                    <tr>
+                        <td>2. Penetapan jumlah produksi berikutnya hanya didasarkan pada perkiraan tanpa melihat data penjualan sebelumnya.</td>
+                        <td class="text-center"><input type="radio" name="q6_2" value="Benar"></td>
+                        <td class="text-center"><input type="radio" name="q6_2" value="Salah"></td>
+                    </tr>
+                    <tr>
+                        <td>3. Jadwal kerja harian perlu disesuaikan dengan kapasitas mesin dan jumlah tenaga kerja yang tersedia.</td>
+                        <td class="text-center"><input type="radio" name="q6_3" value="Benar"></td>
+                        <td class="text-center"><input type="radio" name="q6_3" value="Salah"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- SOAL 7 -->
+        <div class="card question-card">
+            <div class="question-title">
+                <span>Soal Nomor 7</span>
+                <span class="badge">Pilihan Ganda (Hitungan)</span>
+            </div>
+            <div class="stimulus">
+                <strong>Data Biaya Produksi "NASPO" (100 porsi/hari):</strong><br>
+                - Bahan baku langsung: Rp 250.000,00<br>
+                - Tenaga kerja langsung: Rp 100.000,00<br>
+                - Biaya overhead pabrik: Rp 50.000,00<br>
+                <strong>Total Biaya Produksi: Rp 400.000,00</strong>
+            </div>
+            <p style="margin-bottom: 12px; font-weight: 600;">Jika pemilik ingin memperoleh laba sebesar 25% dari total biaya produksi, berapa harga jual per porsi NASPO?</p>
+            <div class="options">
+                <label class="option-label">
+                    <input type="radio" name="q7" value="A">
+                    A. Rp 4.000,00
+                </label>
+                <label class="option-label">
+                    <input type="radio" name="q7" value="B">
+                    B. Rp 4.500,00
+                </label>
+                <label class="option-label">
+                    <input type="radio" name="q7" value="C">
+                    C. Rp 5.000,00
+                </label>
+                <label class="option-label">
+                    <input type="radio" name="q7" value="D">
+                    D. Rp 6.000,00
+                </label>
+            </div>
+        </div>
+
+        <!-- SOAL 8 -->
+        <div class="card question-card">
+            <div class="question-title">
+                <span>Soal Nomor 8</span>
+                <span class="badge">Pilihan Ganda</span>
+            </div>
+            <div class="stimulus">
+                <strong>Stimulus:</strong> Sekelompok murid SMK membuat minuman herbal alami dan menjualnya secara langsung kepada teman sekolah dan guru di kantin tanpa perantara.
+            </div>
+            <p style="margin-bottom: 12px; font-weight: 600;">Saluran distribusi yang digunakan oleh murid-murid tersebut adalah...</p>
+            <div class="options">
+                <label class="option-label">
+                    <input type="radio" name="q8" value="A">
+                    A. Tiga tingkat (Produsen &rarr; Agen &rarr; Grosir &rarr; Pengecer &rarr; Konsumen)
+                </label>
+                <label class="option-label">
+                    <input type="radio" name="q8" value="B">
+                    B. Dua tingkat (Produsen &rarr; Grosir &rarr; Pengecer &rarr; Konsumen)
+                </label>
+                <label class="option-label">
+                    <input type="radio" name="q8" value="C">
+                    C. Langsung / Nol tingkat (Produsen &rarr; Konsumen)
+                </label>
+                <label class="option-label">
+                    <input type="radio" name="q8" value="D">
+                    D. Tidak langsung melalui distributor tunggal
+                </label>
+            </div>
+        </div>
+
+        <!-- SOAL 9 -->
+        <div class="card question-card">
+            <div class="question-title">
+                <span>Soal Nomor 9</span>
+                <span class="badge">Pilihan Ganda Kompleks (Analisis SWOT)</span>
+            </div>
+            <div class="stimulus">
+                <strong>Stimulus:</strong> Perusahaan startup "V-Mobile" menganalisis lingkungan bisnisnya untuk strategi ekspansi.
+            </div>
+            <p style="margin-bottom: 12px; font-weight: 600;">Kelompokkan kondisi bisnis V-Mobile berikut ke dalam kategori SWOT yang tepat!</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Kondisi Bisnis</th>
+                        <th class="text-center">Kekuatan (S)</th>
+                        <th class="text-center">Kelemahan (W)</th>
+                        <th class="text-center">Peluang (O)</th>
+                        <th class="text-center">Ancaman (T)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>1. Keahlian tim pengembang dalam menciptakan fitur ramah pengguna</td>
+                        <td class="text-center"><input type="radio" name="q9_1" value="S"></td>
+                        <td class="text-center"><input type="radio" name="q9_1" value="W"></td>
+                        <td class="text-center"><input type="radio" name="q9_1" value="O"></td>
+                        <td class="text-center"><input type="radio" name="q9_1" value="T"></td>
+                    </tr>
+                    <tr>
+                        <td>2. Ketergantungan berlebihan pada satu model layanan saja</td>
+                        <td class="text-center"><input type="radio" name="q9_2" value="S"></td>
+                        <td class="text-center"><input type="radio" name="q9_2" value="W"></td>
+                        <td class="text-center"><input type="radio" name="q9_2" value="O"></td>
+                        <td class="text-center"><input type="radio" name="q9_2" value="T"></td>
+                    </tr>
+                    <tr>
+                        <td>3. Tingginya tingkat adopsi teknologi digital di masyarakat</td>
+                        <td class="text-center"><input type="radio" name="q9_3" value="S"></td>
+                        <td class="text-center"><input type="radio" name="q9_3" value="W"></td>
+                        <td class="text-center"><input type="radio" name="q9_3" value="O"></td>
+                        <td class="text-center"><input type="radio" name="q9_3" value="T"></td>
+                    </tr>
+                    <tr>
+                        <td>4. Munculnya pesaing baru dengan modal besar dan tarif promo murah</td>
+                        <td class="text-center"><input type="radio" name="q9_4" value="S"></td>
+                        <td class="text-center"><input type="radio" name="q9_4" value="W"></td>
+                        <td class="text-center"><input type="radio" name="q9_4" value="O"></td>
+                        <td class="text-center"><input type="radio" name="q9_4" value="T"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <button type="button" class="btn-submit" onclick="submitQuiz()">KIRIM JAWABAN SAYA</button>
+    </form>
+
+    <!-- HASIL UJIAN -->
+    <div class="card" id="result-card">
+        <h2 style="color: var(--primary-color);">Hasil Asesmen TKA Online</h2>
+        <p id="student-info" style="margin-top: 10px; font-size: 1.1rem;"></p>
+        <div class="score-box" id="score-display">0 / 100</div>
+        <p id="score-status" style="font-weight: bold; font-size: 1.1rem;"></p>
+        
+        <div class="feedback-list" id="feedback-container"></div>
+
+        <button type="button" class="btn-submit" style="margin-top: 25px; background: var(--primary-color);" onclick="window.location.reload();">Ulangi Tes</button>
+    </div>
+</div>
+
+<script>
+    function submitQuiz() {
+        const nama = document.getElementById('nama').value.trim();
+        const kelas = document.getElementById('kelas').value.trim();
+        const nisn = document.getElementById('nisn').value.trim();
+
+        if (!nama || !kelas || !nisn) {
+            alert('Silakan lengkapi Identitas Peserta Ujian terlebih dahulu!');
+            document.getElementById('identity-card').scrollIntoView({ behavior: 'smooth' });
+            return;
         }
 
-        function filterStudentList(query) {
-            renderStudentTable(query);
+        let score = 0;
+        let totalQuestions = 9;
+        let feedbackHtml = '';
+
+        // Checking Q1
+        const q1 = document.querySelector('input[name="q1"]:checked')?.value;
+        if (q1 === 'A') {
+            score += 11.11;
+            feedbackHtml += `<div class="feedback-item feedback-success">&check; <strong>Soal 1: BENAR</strong> - Komposisi, Kedaluwarsa, dan PIRT/BPOM wajib untuk minimarket.</div>`;
+        } else {
+            feedbackHtml += `<div class="feedback-item feedback-error">&cross; <strong>Soal 1: SALAH</strong> - Jawaban tepat adalah A (Komposisi, tanggal kedaluwarsa, PIRT/BPOM).</div>`;
         }
 
-        function shortcutCheckStudent(studentName) {
-            switchTab('search');
-            document.getElementById('studentSearchInput').value = studentName;
-            triggerConfirmationModal();
+        // Checking Q2
+        const q2 = document.querySelector('input[name="q2"]:checked')?.value;
+        if (q2 === 'D') {
+            score += 11.11;
+            feedbackHtml += `<div class="feedback-item feedback-success">&check; <strong>Soal 2: BENAR</strong> - Proyeksi keuangan & ROI sangat krusial bagi investor.</div>`;
+        } else {
+            feedbackHtml += `<div class="feedback-item feedback-error">&cross; <strong>Soal 2: SALAH</strong> - Jawaban tepat adalah D (Proyeksi keuangan, BEP, dan ROI).</div>`;
         }
 
-        function showToast(message, type = 'success') {
-            const toast = document.getElementById('toastNotification');
-            const isSuccess = type === 'success';
-
-            toast.className = `p-4 rounded-xl shadow-md border text-sm flex items-start gap-3 transition-all ${
-                isSuccess 
-                    ? 'bg-emerald-50 border-emerald-200 text-emerald-900' 
-                    : 'bg-rose-50 border-rose-200 text-rose-900'
-            }`;
-
-            toast.innerHTML = `
-                <i class="fa-solid ${isSuccess ? 'fa-circle-check text-emerald-600' : 'fa-circle-exclamation text-rose-600'} text-lg mt-0.5"></i>
-                <div class="flex-grow">${message}</div>
-                <button onclick="document.getElementById('toastNotification').classList.add('hidden')" class="text-slate-400 hover:text-slate-600">
-                    <i class="fa-solid fa-xmark"></i>
-                </button>
-            `;
-
-            toast.classList.remove('hidden');
-
-            setTimeout(() => {
-                toast.classList.add('hidden');
-            }, 5000);
+        // Checking Q3
+        const q3_1 = document.querySelector('input[name="q3_1"]:checked')?.value;
+        const q3_2 = document.querySelector('input[name="q3_2"]:checked')?.value;
+        const q3_3 = document.querySelector('input[name="q3_3"]:checked')?.value;
+        if (q3_1 === 'Benar' && q3_2 === 'Salah' && q3_3 === 'Salah') {
+            score += 11.11;
+            feedbackHtml += `<div class="feedback-item feedback-success">&check; <strong>Soal 3: BENAR</strong> - Evaluasi tindakan branding sudah tepat.</div>`;
+        } else {
+            feedbackHtml += `<div class="feedback-item feedback-error">&cross; <strong>Soal 3: SALAH</strong> - Kunci: 1. Benar, 2. Salah, 3. Salah.</div>`;
         }
 
-        // Close dropdown when clicking outside
-        document.addEventListener('click', function(e) {
-            const dropdown = document.getElementById('autocompleteDropdown');
-            const searchInput = document.getElementById('studentSearchInput');
-            if (!dropdown.contains(e.target) && e.target !== searchInput) {
-                dropdown.classList.add('hidden');
-            }
-        });
-    </script>
+        // Checking Q4
+        const q4_a = document.querySelector('input[name="q4"][value="A"]').checked;
+        const q4_b = document.querySelector('input[name="q4"][value="B"]').checked;
+        const q4_c = document.querySelector('input[name="q4"][value="C"]').checked;
+        const q4_d = document.querySelector('input[name="q4"][value="D"]').checked;
+        if (q4_a && q4_b && !q4_c && !q4_d) {
+            score += 11.11;
+            feedbackHtml += `<div class="feedback-item feedback-success">&check; <strong>Soal 4: BENAR</strong> - Kombinasi medsos tertarget dan micro-influencer tepat.</div>`;
+        } else {
+            feedbackHtml += `<div class="feedback-item feedback-error">&cross; <strong>Soal 4: SALAH</strong> - Jawaban tepat adalah A dan B.</div>`;
+        }
+
+        // Checking Q5
+        const q5 = document.querySelector('input[name="q5"]:checked')?.value;
+        if (q5 === 'C') {
+            score += 11.11;
+            feedbackHtml += `<div class="feedback-item feedback-success">&check; <strong>Soal 5: BENAR</strong> - Urutan produksi aplikasi runtut (Analisis &rarr; UI/UX &rarr; Coding &rarr; Testing &rarr; Deployment).</div>`;
+        } else {
+            feedbackHtml += `<div class="feedback-item feedback-error">&cross; <strong>Soal 5: SALAH</strong> - Jawaban tepat adalah C.</div>`;
+        }
+
+        // Checking Q6
+        const q6_1 = document.querySelector('input[name="q6_1"]:checked')?.value;
+        const q6_2 = document.querySelector('input[name="q6_2"]:checked')?.value;
+        const q6_3 = document.querySelector('input[name="q6_3"]:checked')?.value;
+        if (q6_1 === 'Benar' && q6_2 === 'Salah' && q6_3 === 'Benar') {
+            score += 11.11;
+            feedbackHtml += `<div class="feedback-item feedback-success">&check; <strong>Soal 6: BENAR</strong> - Analisis perencanaan produksi tepat.</div>`;
+        } else {
+            feedbackHtml += `<div class="feedback-item feedback-error">&cross; <strong>Soal 6: SALAH</strong> - Kunci: 1. Benar, 2. Salah, 3. Benar.</div>`;
+        }
+
+        // Checking Q7
+        const q7 = document.querySelector('input[name="q7"]:checked')?.value;
+        if (q7 === 'C') {
+            score += 11.11;
+            feedbackHtml += `<div class="feedback-item feedback-success">&check; <strong>Soal 7: BENAR</strong> - Hitungan harga jual Rp 5.000,00 tepat.</div>`;
+        } else {
+            feedbackHtml += `<div class="feedback-item feedback-error">&cross; <strong>Soal 7: SALAH</strong> - Jawaban tepat adalah C (Rp 400.000 + 25% = Rp 500.000 / 100 porsi = Rp 5.000).</div>`;
+        }
+
+        // Checking Q8
+        const q8 = document.querySelector('input[name="q8"]:checked')?.value;
+        if (q8 === 'C') {
+            score += 11.11;
+            feedbackHtml += `<div class="feedback-item feedback-success">&check; <strong>Soal 8: BENAR</strong> - Penjualan langsung tanpa perantara adalah saluran Nol Tingkat.</div>`;
+        } else {
+            feedbackHtml += `<div class="feedback-item feedback-error">&cross; <strong>Soal 8: SALAH</strong> - Jawaban tepat adalah C (Saluran Langsung / Nol tingkat).</div>`;
+        }
+
+        // Checking Q9
+        const q9_1 = document.querySelector('input[name="q9_1"]:checked')?.value;
+        const q9_2 = document.querySelector('input[name="q9_2"]:checked')?.value;
+        const q9_3 = document.querySelector('input[name="q9_3"]:checked')?.value;
+        const q9_4 = document.querySelector('input[name="q9_4"]:checked')?.value;
+        if (q9_1 === 'S' && q9_2 === 'W' && q9_3 === 'O' && q9_4 === 'T') {
+            score += 11.11;
+            feedbackHtml += `<div class="feedback-item feedback-success">&check; <strong>Soal 9: BENAR</strong> - Pengelompokan matriks SWOT sangat tepat.</div>`;
+        } else {
+            feedbackHtml += `<div class="feedback-item feedback-error">&cross; <strong>Soal 9: SALAH</strong> - Kunci: 1. Strengths, 2. Weaknesses, 3. Opportunities, 4. Threats.</div>`;
+        }
+
+        let finalScore = Math.round(score);
+
+        document.getElementById('quizForm').style.display = 'none';
+        document.getElementById('identity-card').style.display = 'none';
+
+        const resultCard = document.getElementById('result-card');
+        resultCard.style.display = 'block';
+
+        document.getElementById('student-info').innerHTML = `<strong>${nama}</strong> (${kelas}) - NISN: ${nisn}`;
+        document.getElementById('score-display').innerText = finalScore;
+        
+        const statusElem = document.getElementById('score-status');
+        if (finalScore >= 75) {
+            statusElem.innerText = 'LULUS (Memenuhi Kriteria Ketuntasan)';
+            statusElem.style.color = '#22543d';
+        } else {
+            statusElem.innerText = 'BELUM LULUS (Perlu Remedial)';
+            statusElem.style.color = '#742a2a';
+        }
+
+        document.getElementById('feedback-container').innerHTML = feedbackHtml;
+        resultCard.scrollIntoView({ behavior: 'smooth' });
+    }
+</script>
+
 </body>
 </html>
